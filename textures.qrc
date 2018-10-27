@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>cube.png</file>
+        <file>HeightMap.png</file>
+        <file>TextureDegrade.png</file>
+        <file>fall.png</file>
+        <file>spring.png</file>
+        <file>summer.png</file>
+        <file>winter.png</file>
+    </qresource>
+</RCC>
