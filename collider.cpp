@@ -20,7 +20,7 @@ bool Collider::SphereCollide(Collider target)
 
 bool Collider::BBCollide(Collider target)
 {
-    return false
+    return false;
 }
 
 bool Collider::OBBCollide(Collider target)
