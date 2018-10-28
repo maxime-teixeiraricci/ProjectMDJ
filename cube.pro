@@ -5,7 +5,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     mesh.cpp \
-    obj_loader.cpp
+    obj_loader.cpp \
+    collider.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -14,7 +15,8 @@ SOURCES += \
 HEADERS += \
     mainwidget.h \
     geometryengine.h \
-    mesh.h
+    mesh.h \
+    collider.h
 
 RESOURCES += \
     shaders.qrc \
@@ -28,4 +30,5 @@ DISTFILES += \
     cube.png \
     cube.obj \
     cube.obj \
-    cube.obj
+    cube.obj \
+    ../ProjectMDJ/PaletteTest.png

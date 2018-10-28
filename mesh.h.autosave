@@ -24,6 +24,7 @@ public:
     QVector3D max;
     QVector3D min;
     QVector3D center;
+    double sphereBoundDistance;
 
 
 };

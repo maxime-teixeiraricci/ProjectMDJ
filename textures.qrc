@@ -7,5 +7,6 @@
         <file>spring.png</file>
         <file>summer.png</file>
         <file>winter.png</file>
+        <file>PaletteTest.png</file>
     </qresource>
 </RCC>
