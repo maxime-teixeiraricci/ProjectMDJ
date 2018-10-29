@@ -62,11 +62,11 @@ class GeometryEngine : protected QOpenGLFunctions
 public:
     GeometryEngine();
     virtual ~GeometryEngine();
-    void InitMesh();
     void Draw(QOpenGLShaderProgram *program);
     int numberVertices;
     std::vector<Mesh3D> meshes;
     int snow;
+    void DrawBB(Mesh3D mesh,QOpenGLShaderProgram *program);
 
 private:
     QOpenGLBuffer arrayBuf;

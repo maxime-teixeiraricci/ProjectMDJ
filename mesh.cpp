@@ -54,10 +54,10 @@ void Mesh3D::Load()
 
             if (max.x()< X) max.setX(X);
             if (max.y()< Y) max.setY(Y);
-            if (max.z()< Z) max.setX(Z);
+            if (max.z()< Z) max.setZ(Z);
             if (min.x()> X) min.setX(X);
             if (min.y()> Y) min.setY(Y);
-            if (min.z()> Z) min.setX(Z);
+            if (min.z()> Z) min.setZ(Z);
             center += vertex;
             verticePosition.push_back(vertex);
         }else if ( lineHeader[0] == 'v' && lineHeader[1] == 't'){
@@ -99,6 +99,8 @@ void Mesh3D::Load()
     }
     center/=verticePosition.size();
     printf("Vector3D(%f, %f, %f)\n",center.x(), center.y(), center.z() );
+    printf("Vector3D(%f, %f, %f)\n",max.x(), max.y(), max.z() );
+    printf("Vector3D(%f, %f, %f)\n",min.x(), min.y(), min.z() );
     for (int i = 0; i < verticePosition.size(); i ++)
     {
         double d = (center-verticePosition[i]).length();
@@ -113,6 +115,9 @@ void Mesh3D::Translate(QVector3D vector)
     {
         verticePosition[i] = verticePosition[i] + vector;
     }
+    max += vector;
+    min += vector;
+    center += vector;
 }
 
 void Mesh3D::Scale(double scale)
@@ -121,5 +126,8 @@ void Mesh3D::Scale(double scale)
     {
         verticePosition[i] = verticePosition[i] * scale;
     }
+    max *=scale;
+    min *=scale;
+    center *=scale;
 }
 
