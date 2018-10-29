@@ -111,7 +111,7 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    applicationTime += 0.1 * timeScale;
+    applicationTime += 0.025 * timeScale;
     // Decrease angular speed (friction)
     angularSpeed *= 0.99;
     //angularSpeed =1;
@@ -254,7 +254,7 @@ void MainWidget::paintGL()
     //matrix.translate(0.0, 0, .0);
     //matrix.rotate(rotation);
 
-    matrix.lookAt(QVector3D(3*sin(applicationTime),3*cos(applicationTime),3), // Eye
+    matrix.lookAt(QVector3D(5*sin(applicationTime),5*cos(applicationTime),3), // Eye
                   QVector3D(0,0,0), // Center
                   QVector3D(0,0,1)); // Normal
 

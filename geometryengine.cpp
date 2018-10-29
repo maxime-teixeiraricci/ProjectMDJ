@@ -57,12 +57,13 @@ using namespace std;
 #include <QVector3D>
 #include <QColor>
 #include <QImage>
-
+#include <QPainter>
 
 struct VertexData
 {
     QVector3D position;
     QVector2D texCoord;
+    QVector3D normal;
 };
 
 //! [0]
@@ -70,27 +71,27 @@ GeometryEngine::GeometryEngine()
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
     Mesh3D m = Mesh3D();
-    Mesh3D m1 = Mesh3D();
+    snow = 0;
+    /*Mesh3D m1 = Mesh3D();
     Mesh3D m2 = Mesh3D();
 
+    for (int i = 0; i < 25; i++)
+    {
+        Mesh3D m = Mesh3D();
+        m.Load();
+        m.Translate(QVector3D(2-i%5,2-i/5,0));
+        meshes.push_back(m);
+
+    }*/
     m.Load();
-    m1.Load();
-    m2.Load();
-    m.Translate(QVector3D(0,1,0));
-    m2.Translate(QVector3D(1,0,-1));
+    m.Scale(0.25);
+
     meshes.push_back(m);
-    meshes.push_back(m1);
-    meshes.push_back(m2);
     initializeOpenGLFunctions();
 
     // Generate 2 VBOs
     arrayBuf.create();
     indexBuf.create();
-
-    // Initializes cube geometry and transfers it to VBOs
-    //initCubeGeometry();
-
-    InitMesh();
 }
 
 GeometryEngine::~GeometryEngine()
@@ -100,280 +101,122 @@ GeometryEngine::~GeometryEngine()
 }
 //! [0]
 
-
-void GeometryEngine::initCubeGeometry()
-{
-    // For cube we would need only 8 vertices but we have to
-    // duplicate vertex for each face because texture coordinate
-    // is different.
-    VertexData vertices[] = {
-        // Vertex data for face 0
-        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(0.0f, 0.0f)},  // v0
-        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(0.33f, 0.0f)}, // v1
-        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(0.0f, 0.5f)},  // v2
-        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.33f, 0.5f)}, // v3
-
-        // Vertex data for face 1
-        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D( 0.0f, 0.5f)}, // v4
-        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.33f, 0.5f)}, // v5
-        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.0f, 1.0f)},  // v6
-        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v7
-
-        // Vertex data for face 2
-        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.5f)}, // v8
-        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(1.0f, 0.5f)},  // v9
-        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}, // v10
-        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(1.0f, 1.0f)},  // v11
-
-        // Vertex data for face 3
-        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.0f)}, // v12
-        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(1.0f, 0.0f)},  // v13
-        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.66f, 0.5f)}, // v14
-        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(1.0f, 0.5f)},  // v15
-
-        // Vertex data for face 4
-        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(0.33f, 0.0f)}, // v16
-        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.0f)}, // v17
-        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(0.33f, 0.5f)}, // v18
-        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(0.66f, 0.5f)}, // v19
-
-        // Vertex data for face 5
-        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(0.33f, 0.5f)}, // v20
-        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.66f, 0.5f)}, // v21
-        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v22
-        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}  // v23
-    };
-
-    // Indices for drawing cube faces using triangle strips.
-    // Triangle strips can be connected by duplicating indices
-    // between the strips. If connecting strips have opposite
-    // vertex order then last index of the first strip and first
-    // index of the second strip needs to be duplicated. If
-    // connecting strips have same vertex order then only last
-    // index of the first strip needs to be duplicated.
-    GLushort indices[] = {
-         0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
-         4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
-         8,  8,  9, 10, 11, 11, // Face 2 - triangle strip ( v8,  v9, v10, v11)
-        12, 12, 13, 14, 15, 15, // Face 3 - triangle strip (v12, v13, v14, v15)
-        16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
-        20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
-    };
-
-//! [1]
-    // Transfer vertex data to VBO 0
-    arrayBuf.bind();
-    arrayBuf.allocate(vertices, 24 * sizeof(VertexData));
-
-    // Transfer index data to VBO 1
-    indexBuf.bind();
-    indexBuf.allocate(indices, 34 * sizeof(GLushort));
-//! [1]
-}
-
-//! [2]
-void GeometryEngine::drawCubeGeometry(QOpenGLShaderProgram *program)
-{
-    // Tell OpenGL which VBOs to use
-    arrayBuf.bind();
-    indexBuf.bind();
-
-    // Offset for position
-    quintptr offset = 0;
-
-    // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = program->attributeLocation("a_position");
-    program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    // Offset for texture coordinate
-    offset += sizeof(QVector3D);
-
-    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int texcoordLocation = program->attributeLocation("a_texcoord");
-    program->enableAttributeArray(texcoordLocation);
-    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-
-    // Draw cube geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, 0);
-}
-//! [2]
-
-void GeometryEngine::initPlaneGeometry()
-{
-    // For cube we would need only 8 vertices but we have to
-    // duplicate vertex for each face because texture coordinate
-    // is different.
-
-    cout << z << endl;
-    int numberVertices = 16*16;
-    int numberTriangles=8*8*2*3;
-    VertexData vertices[16*16];
-    QImage heightMap = QImage(":/cube.png");
-
-
-
-
-    ///Faire la height map en utilisant les pixels.
-
-
-    for (int i = 0; i < numberVertices; i++)
-    {
-        float X = 2*(i%16)/15.0f-1 ; float Y = 2*(i/16)/15.0f-1;
-        int heightX = (int) ((i%16)/15.0f*heightMap.width());
-        int heightY = (int) ((i/16)/15.0f * heightMap.height());
-        QColor colorHeight = heightMap.pixelColor(heightX, heightY);
-        vertices[i] = {QVector3D(X,Y,0),
-                       QVector2D((i%16)/15.0f, (i/16)/15.0f)};
-    }
-
-    // Indices for drawing cube faces using triangle strips.
-    // Triangle strips can be connected by duplicating indices
-    // between the strips. If connecting strips have opposite
-    // vertex order then last index of the first strip and first
-    // index of the second strip needs to be duplicated. If
-    // connecting strips have same vertex order then only last
-    // index of the first strip needs to be duplicated.
-    GLushort indices[15*15*6];
-    int t =0;
-    for (int i = 0; i < 16*16; i++)
-    {
-        int I = i%16 ; int J = i/16;
-        if (!(I==15 || J ==15))
-        {
-
-            indices[t++] = I + 16*J;
-            indices[t++] = I+ 16*(J+1);
-            indices[t++] = I+1+16*J;
-
-            indices[t++] = I + 16*(J+1);
-            indices[t++] = I+1+16*(J+1);
-            indices[t++] = I+1+ 16*J;
-        }
-    }
-
-
-    // Indices for drawing cube faces using triangle strips.
-    // Triangle strips can be connected by duplicating indices
-    // between the strips. If connecting strips have opposite
-    // vertex order then last index of the first strip and first
-    // index of the second strip needs to be duplicated. If
-    // connecting strips have same vertex order then only last
-    // index of the first strip needs to be duplicated.
-
-    //! [1]
-    // Transfer vertex data to VBO 0
-    arrayBuf.bind();
-    arrayBuf.allocate(vertices, numberVertices * sizeof(VertexData));
-
-    // Transfer index data to VBO 1
-    indexBuf.bind();
-    indexBuf.allocate(indices, 15*15*6 * sizeof(GLushort));
-    //! [1]
-}
-
-void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program)
-{
-    // Tell OpenGL which VBOs to use
-    arrayBuf.bind();
-    indexBuf.bind();
-
-    // Offset for position
-    quintptr offset = 0;
-
-    // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = program->attributeLocation("a_position");
-    program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    // Offset for texture coordinate
-    offset += sizeof(QVector3D);
-
-    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int texcoordLocation = program->attributeLocation("a_texcoord");
-    program->enableAttributeArray(texcoordLocation);
-    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-
-    // Draw cube geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLES, 15*15*6, GL_UNSIGNED_SHORT, 0);
-}
-
-void GeometryEngine::MeshDisplay(QOpenGLShaderProgram *program)
-{
-    // Tell OpenGL which VBOs to use
-    arrayBuf.bind();
-    indexBuf.bind();
-
-    // Offset for position
-    quintptr offset = 0;
-
-    // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = program->attributeLocation("a_position");
-    program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    // Offset for texture coordinate
-    offset += sizeof(QVector3D);
-
-    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int texcoordLocation = program->attributeLocation("a_texcoord");
-    program->enableAttributeArray(texcoordLocation);
-    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-
-    // Draw cube geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLES, numberVertices*3, GL_UNSIGNED_SHORT, 0);
-}
-
 void GeometryEngine::Draw(QOpenGLShaderProgram *program)
 {
-
-    arrayBuf.bind();
-    indexBuf.bind();
-
-    quintptr offset = 0;
-
-    int vertexLocation = program->attributeLocation("a_position");
-    program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    offset += sizeof(QVector3D);
-
-    int texcoordLocation = program->attributeLocation("a_texcoord");
-    program->enableAttributeArray(texcoordLocation);
-    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-
-    glDrawElements(GL_TRIANGLES, numberVertices*3, GL_UNSIGNED_SHORT, 0);
-}
-
-void GeometryEngine::InitMesh()
-{
     // For each vertex of each triangle
-    vector<VertexData> outVertexData;
-    vector<GLushort> outIndexData;
+   /* vector<VertexData> outVertexData;
+    vector<GLushort> outIndexData;*/
 
     for (int m = 0; m < meshes.size(); m++)
     {
         Mesh3D mesh = meshes[m];
-        printf("M : %d \n", m);
+
         int j =0;
+        vector<VertexData> outVertexData;
+        vector<GLushort> outIndexData;
         for( unsigned int i=0; i < mesh.trianglesIndex.size(); i++ )
         {
+
             int I = mesh.trianglesIndex[i];
+            int J = mesh.texturesIndex[i];
+            int K = mesh.normalsIndex[i];
            QVector3D vertex = mesh.verticePosition[ I ];
-           QVector2D texture = mesh.texturePosition[ I ];
-           outVertexData.push_back( {vertex, texture});
-           outIndexData.push_back(outVertexData.size()-1);
+           QVector2D texture = mesh.texturePosition[ J ];
+           QVector3D normal = mesh.normals[K];
+           //printf("3D<%d,%d,%d>\n",normal.x(), normal.y(), normal.z());
+           outVertexData.push_back( {vertex, texture,normal});
+           outIndexData.push_back(i);
+
+
         }
-        printf("%d<>%d\n", outVertexData.size(), outIndexData.size());
+
+        arrayBuf.bind();
+        arrayBuf.allocate(outVertexData.data(), outVertexData.size() * sizeof(VertexData));
+
+        // Transfer index data to VBO 1
+        indexBuf.bind();
+        indexBuf.allocate(outIndexData.data(), outIndexData.size() * sizeof(GLushort));
+        numberVertices = outIndexData.size();
+
+
+
+
+
+        quintptr offset = 0;
+        //program->setAttributeValue(program->attributeLocation("snow"), snow);
+        int vertexLocation = program->attributeLocation("a_position");
+        program->enableAttributeArray(vertexLocation);
+        program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+        offset += sizeof(QVector3D);
+
+        int texcoordLocation = program->attributeLocation("a_texcoord");
+        program->enableAttributeArray(texcoordLocation);
+        program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+        offset += sizeof(QVector2D);
+
+        int normalLocation = program->attributeLocation("a_normal");
+        program->enableAttributeArray(normalLocation);
+        program->setAttributeBuffer(normalLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+        meshes[m].texture->bind();
+
+
+
+        glDrawElements(GL_TRIANGLES, numberVertices*3, GL_UNSIGNED_SHORT, 0);
+
     }
 
+}
+
+
+void GeometryEngine::DrawBB(Mesh3D mesh,QOpenGLShaderProgram *program)
+{
+    VertexData pos[] =
+    {
+        {QVector3D(mesh.min.x(),mesh.min.y(),mesh.min.z()), QVector2D(0,0)}, // [0]
+        {QVector3D(mesh.max.x(),mesh.min.y(),mesh.min.z()), QVector2D(0,0)}, // [1]
+        {QVector3D(mesh.min.x(),mesh.max.y(),mesh.min.z()), QVector2D(0,0)}, // [2]
+        {QVector3D(mesh.max.x(),mesh.max.y(),mesh.min.z()), QVector2D(0,0)}, // [3]
+        {QVector3D(mesh.min.x(),mesh.min.y(),mesh.max.z()), QVector2D(0,0)}, // [4]
+        {QVector3D(mesh.max.x(),mesh.min.y(),mesh.max.z()), QVector2D(0,0)}, // [5]
+        {QVector3D(mesh.min.x(),mesh.max.y(),mesh.max.z()), QVector2D(0,0)}, // [6]
+        {QVector3D(mesh.max.x(),mesh.max.y(),mesh.max.z()), QVector2D(0,0)}  // [7]
+    };
+    int index[] =
+    {
+        0,2,
+        0,1,
+        2,3,
+        1,3,
+        4,6,
+        4,5,
+        6,7,
+        5,7,
+        0,4,
+        5,1,
+        7,3,
+        6,2
+    };
     arrayBuf.bind();
-    arrayBuf.allocate(outVertexData.data(), outVertexData.size() * sizeof(VertexData));
+    arrayBuf.allocate(pos, 8 * sizeof(VertexData));
 
     // Transfer index data to VBO 1
     indexBuf.bind();
-    indexBuf.allocate(outIndexData.data(), outIndexData.size() * sizeof(GLushort));
+    indexBuf.allocate(index, 24 * sizeof(int));
+    quintptr offset = 0;
+    //program->setAttributeValue(program->attributeLocation("snow"), snow);
+    int vertexLocation = program->attributeLocation("a_position");
+    program->enableAttributeArray(vertexLocation);
+    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
 
-    numberVertices = outIndexData.size();
+    offset += sizeof(QVector3D);
+
+    int texcoordLocation = program->attributeLocation("a_texcoord");
+    program->enableAttributeArray(texcoordLocation);
+    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+    glDrawElements(GL_LINES, 24*2, GL_UNSIGNED_SHORT, 0);
+
 }
 

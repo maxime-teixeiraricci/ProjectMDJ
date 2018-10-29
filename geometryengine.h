@@ -62,21 +62,13 @@ class GeometryEngine : protected QOpenGLFunctions
 public:
     GeometryEngine();
     virtual ~GeometryEngine();
-
-    void drawCubeGeometry(QOpenGLShaderProgram *program);
-    void drawPlaneGeometry(QOpenGLShaderProgram *program);
     void Draw(QOpenGLShaderProgram *program);
-    void InitMesh();
-    void MeshDisplay(QOpenGLShaderProgram *program);
-    //objl::Loader loader;
-    int z;
     int numberVertices;
     std::vector<Mesh3D> meshes;
+    int snow;
+    void DrawBB(Mesh3D mesh,QOpenGLShaderProgram *program);
+
 private:
-    void initCubeGeometry();
-    void initPlaneGeometry();
-
-
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
 };
