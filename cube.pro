@@ -5,7 +5,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     mesh.cpp \
-    obj_loader.cpp
+    obj_loader.cpp \
+    gameobject.cpp \
+    scenegraph.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -14,7 +16,9 @@ SOURCES += \
 HEADERS += \
     mainwidget.h \
     geometryengine.h \
-    mesh.h
+    mesh.h \
+    gameobject.h \
+    scenegraph.h
 
 RESOURCES += \
     shaders.qrc \
