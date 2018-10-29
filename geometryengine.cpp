@@ -57,39 +57,28 @@ using namespace std;
 #include <QVector3D>
 #include <QColor>
 #include <QImage>
-#include <QPainter>
+#include <collider.h>
 
 struct VertexData
 {
     QVector3D position;
     QVector2D texCoord;
     QVector3D normal;
+    QVector3D color;
 };
 
 //! [0]
 GeometryEngine::GeometryEngine()
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
-    Mesh3D m = Mesh3D();
-    snow = 0;
-    /*Mesh3D m1 = Mesh3D();
-    Mesh3D m2 = Mesh3D();
+    Mesh3D m1;
+    m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
+    m1.Scale(0.2);
+    Collider c(m1);
+    meshes.push_back(m1);
+    meshes.push_back(c.SphereCollider());
 
-    for (int i = 0; i < 25; i++)
-    {
-        Mesh3D m = Mesh3D();
-        m.Load();
-        m.Translate(QVector3D(2-i%5,2-i/5,0));
-        meshes.push_back(m);
-
-    }*/
-    m.Load();
-    m.Scale(0.25);
-
-    meshes.push_back(m);
     initializeOpenGLFunctions();
-
-    // Generate 2 VBOs
     arrayBuf.create();
     indexBuf.create();
 }
@@ -123,8 +112,9 @@ void GeometryEngine::Draw(QOpenGLShaderProgram *program)
            QVector3D vertex = mesh.verticePosition[ I ];
            QVector2D texture = mesh.texturePosition[ J ];
            QVector3D normal = mesh.normals[K];
+           QVector3D color = (m==0)? QVector3D(1,1,1) : QVector3D(0,1,0);
            //printf("3D<%d,%d,%d>\n",normal.x(), normal.y(), normal.z());
-           outVertexData.push_back( {vertex, texture,normal});
+           outVertexData.push_back( {vertex, texture,normal,color});
            outIndexData.push_back(i);
 
 
@@ -159,64 +149,20 @@ void GeometryEngine::Draw(QOpenGLShaderProgram *program)
         int normalLocation = program->attributeLocation("a_normal");
         program->enableAttributeArray(normalLocation);
         program->setAttributeBuffer(normalLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+        //meshes[m].texture->bind();
+
+        offset += sizeof(QVector3D);
+
+        int colorLocation = program->attributeLocation("a_color");
+        program->enableAttributeArray(colorLocation);
+        program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
         meshes[m].texture->bind();
 
 
 
-        glDrawElements(GL_TRIANGLES, numberVertices*3, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, numberVertices, GL_UNSIGNED_SHORT, 0);
 
     }
-
-}
-
-
-void GeometryEngine::DrawBB(Mesh3D mesh,QOpenGLShaderProgram *program)
-{
-    VertexData pos[] =
-    {
-        {QVector3D(mesh.min.x(),mesh.min.y(),mesh.min.z()), QVector2D(0,0)}, // [0]
-        {QVector3D(mesh.max.x(),mesh.min.y(),mesh.min.z()), QVector2D(0,0)}, // [1]
-        {QVector3D(mesh.min.x(),mesh.max.y(),mesh.min.z()), QVector2D(0,0)}, // [2]
-        {QVector3D(mesh.max.x(),mesh.max.y(),mesh.min.z()), QVector2D(0,0)}, // [3]
-        {QVector3D(mesh.min.x(),mesh.min.y(),mesh.max.z()), QVector2D(0,0)}, // [4]
-        {QVector3D(mesh.max.x(),mesh.min.y(),mesh.max.z()), QVector2D(0,0)}, // [5]
-        {QVector3D(mesh.min.x(),mesh.max.y(),mesh.max.z()), QVector2D(0,0)}, // [6]
-        {QVector3D(mesh.max.x(),mesh.max.y(),mesh.max.z()), QVector2D(0,0)}  // [7]
-    };
-    int index[] =
-    {
-        0,2,
-        0,1,
-        2,3,
-        1,3,
-        4,6,
-        4,5,
-        6,7,
-        5,7,
-        0,4,
-        5,1,
-        7,3,
-        6,2
-    };
-    arrayBuf.bind();
-    arrayBuf.allocate(pos, 8 * sizeof(VertexData));
-
-    // Transfer index data to VBO 1
-    indexBuf.bind();
-    indexBuf.allocate(index, 24 * sizeof(int));
-    quintptr offset = 0;
-    //program->setAttributeValue(program->attributeLocation("snow"), snow);
-    int vertexLocation = program->attributeLocation("a_position");
-    program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    offset += sizeof(QVector3D);
-
-    int texcoordLocation = program->attributeLocation("a_texcoord");
-    program->enableAttributeArray(texcoordLocation);
-    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-
-    glDrawElements(GL_LINES, 24*2, GL_UNSIGNED_SHORT, 0);
 
 }
 

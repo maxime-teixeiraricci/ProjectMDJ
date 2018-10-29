@@ -10,7 +10,7 @@ public:
     Mesh3D();
     void Translate(QVector3D vector);
     void Scale(double scale);
-    void Load();
+    void Load(const char *fileName);
 
     QOpenGLTexture *texture;
     std::vector<QVector3D> verticePosition;

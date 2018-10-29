@@ -17,12 +17,13 @@ Mesh3D::Mesh3D()
     texture = new QOpenGLTexture(QImage(":/PaletteTest.png").mirrored());
 }
 
-void Mesh3D::Load()
+void Mesh3D::Load(const char *fileName)
 {
     std::vector<QVector3D> temp_vertices;
     std::vector<QVector2D> temp_uvs;
     std::vector<QVector3D> temp_normals;
-    QFile file("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
+    //QFile file("C:/Users/Maxime/Documents/ProjectMDJ/sphere.obj");
+    QFile file(fileName);
     file.open(QFile::ReadOnly);
 
     if( file.exists() == NULL )
@@ -98,9 +99,7 @@ void Mesh3D::Load()
         }
     }
     center/=verticePosition.size();
-    printf("Vector3D(%f, %f, %f)\n",center.x(), center.y(), center.z() );
-    printf("Vector3D(%f, %f, %f)\n",max.x(), max.y(), max.z() );
-    printf("Vector3D(%f, %f, %f)\n",min.x(), min.y(), min.z() );
+    sphereBoundDistance = 0;
     for (int i = 0; i < verticePosition.size(); i ++)
     {
         double d = (center-verticePosition[i]).length();
@@ -118,6 +117,12 @@ void Mesh3D::Translate(QVector3D vector)
     max += vector;
     min += vector;
     center += vector;
+    sphereBoundDistance = 0;
+    for (int i = 0; i < verticePosition.size(); i ++)
+    {
+        double d = (center-verticePosition[i]).length();
+        if (d > sphereBoundDistance) sphereBoundDistance = d;
+    }
 }
 
 void Mesh3D::Scale(double scale)
@@ -129,5 +134,11 @@ void Mesh3D::Scale(double scale)
     max *=scale;
     min *=scale;
     center *=scale;
+    sphereBoundDistance = 0;
+    for (int i = 0; i < verticePosition.size(); i ++)
+    {
+        double d = (center-verticePosition[i]).length();
+        if (d > sphereBoundDistance) sphereBoundDistance = d;
+    }
 }
 

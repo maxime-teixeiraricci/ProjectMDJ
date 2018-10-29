@@ -65,8 +65,7 @@ public:
     void Draw(QOpenGLShaderProgram *program);
     int numberVertices;
     std::vector<Mesh3D> meshes;
-    int snow;
-    void DrawBB(Mesh3D mesh,QOpenGLShaderProgram *program);
+
 
 private:
     QOpenGLBuffer arrayBuf;

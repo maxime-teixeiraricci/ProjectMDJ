@@ -7,11 +7,12 @@ class Collider
 {
 public:
     Mesh3D mesh;
-    Collider();
+    Collider(Mesh3D m);
     bool IsCollide(Collider target);
     bool SphereCollide(Collider target);
     bool BBCollide(Collider target);
     bool OBBCollide(Collider target);
+    Mesh3D SphereCollider();
 };
 
 #endif // COLLIDER_H
