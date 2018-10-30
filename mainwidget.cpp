@@ -49,27 +49,26 @@
 ****************************************************************************/
 
 #include "mainwidget.h"
-
+#include "timer_manager.h"
 #include <QMouseEvent>
 #include <iostream>
 #include <collider.h>
-
+#include <QLabel>
+#include <QHBoxLayout>
 //#include <math.h>
 
-MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
+MainWidget::MainWidget(double value, int seasonStart,QWidget *parent) :
     QOpenGLWidget(parent),
     geometries1(0),
     geometries2(0),
     texture(0),
     angularSpeed(0),
-    timeScale(1.0f)
+    timeScale(1.0f),
+    timer(value)
 
 {
-    timeFrequence = 1.0/frequence*1000;
     season = seasonStart;
     z = 0;
-
-
 }
 
 MainWidget::~MainWidget()
@@ -168,11 +167,22 @@ void MainWidget::initializeGL()
     geometries2 = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-   timer.start(timeFrequence, this);
+   timer.startTimer(this);
+
+   // Affichage du label
+   QLabel *label = new QLabel(this);
+   QHBoxLayout *layout = new QHBoxLayout();
+   label->setText("Random String");
+   layout->addWidget(label);
+   setLayout(layout);
+
+
    Mesh3D m1, m2;
-   m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
+   //m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
+   m1.Load("C:/Users/fumey/Desktop/ProjetMDJ/ProjectMDJ/Stage1.obj");
    m1.Scale(0.2);
-   m2.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
+   //m2.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
+   m2.Load("C:/Users/fumey/Desktop/ProjetMDJ/ProjectMDJ/cube.obj");
    m2.Scale(1.5);
    m2.Translate(QVector3D(0,1,0));
    Collider c1(m1), c2(m2);
