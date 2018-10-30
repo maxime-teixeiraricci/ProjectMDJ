@@ -71,12 +71,18 @@ struct VertexData
 GeometryEngine::GeometryEngine()
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
-    Mesh3D m1;
+    Mesh3D m1, m2;
     m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
     m1.Scale(0.2);
-    Collider c(m1);
+    m2.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
+    m2.Scale(1.5);
+    m2.Translate(QVector3D(0,1,0));
+    Collider c1(m1), c2(m2);
     meshes.push_back(m1);
-    meshes.push_back(c.SphereCollider());
+    meshes.push_back(c1.SphereCollider());
+
+    meshes.push_back(m2);
+    meshes.push_back(c2.SphereCollider());
 
     initializeOpenGLFunctions();
     arrayBuf.create();
@@ -92,9 +98,8 @@ GeometryEngine::~GeometryEngine()
 
 void GeometryEngine::Draw(QOpenGLShaderProgram *program)
 {
-    // For each vertex of each triangle
-   /* vector<VertexData> outVertexData;
-    vector<GLushort> outIndexData;*/
+    /*
+     *
 
     for (int m = 0; m < meshes.size(); m++)
     {
@@ -112,7 +117,7 @@ void GeometryEngine::Draw(QOpenGLShaderProgram *program)
            QVector3D vertex = mesh.verticePosition[ I ];
            QVector2D texture = mesh.texturePosition[ J ];
            QVector3D normal = mesh.normals[K];
-           QVector3D color = (m==0)? QVector3D(1,1,1) : QVector3D(0,1,0);
+           QVector3D color = QVector3D(1,0,0);
            //printf("3D<%d,%d,%d>\n",normal.x(), normal.y(), normal.z());
            outVertexData.push_back( {vertex, texture,normal,color});
            outIndexData.push_back(i);
@@ -163,6 +168,6 @@ void GeometryEngine::Draw(QOpenGLShaderProgram *program)
         glDrawElements(GL_TRIANGLES, numberVertices, GL_UNSIGNED_SHORT, 0);
 
     }
-
+*/
 }
 

@@ -13,8 +13,10 @@ varying vec2 v_texcoord;
 void main()
 {
     // Set fragment color from texture
-   gl_FragColor = texture2D(texture, v_texcoord)*(dot(vec4(0,0,1,0),v_normal)*0.5+0.5)*v_color;
+    float a =dot(vec4(0,0,1,0),v_normal);
+   //gl_FragColor = texture2D(texture, v_texcoord)*a*a*v_color;
     //gl_FragColor = v_normal;
+    gl_FragColor = texture2D(texture, v_texcoord)* (dot(vec4(0,0,1,0),v_normal)*0.5+0.5);//+vec4(1,1,1,0)*0.25*v_color;
 }
 //! [0]
 

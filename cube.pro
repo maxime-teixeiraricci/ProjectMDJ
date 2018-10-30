@@ -6,6 +6,8 @@ TEMPLATE = app
 SOURCES += main.cpp \
     mesh.cpp \
     obj_loader.cpp \
+    gameobject.cpp \
+    scenegraph.cpp \
     collider.cpp
 
 SOURCES += \
@@ -16,6 +18,8 @@ HEADERS += \
     mainwidget.h \
     geometryengine.h \
     mesh.h \
+    gameobject.h \
+    scenegraph.h \
     collider.h
 
 RESOURCES += \

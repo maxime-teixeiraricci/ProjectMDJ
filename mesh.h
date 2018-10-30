@@ -3,8 +3,12 @@
 #include <QVector2D>
 #include <QVector3D>
 #include <QOpenGLTexture>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLFunctions>
 
-class Mesh3D
+#include <QOpenGLBuffer>
+
+class Mesh3D : protected QOpenGLFunctions
 {
 public:
     Mesh3D();
@@ -25,6 +29,7 @@ public:
     QVector3D min;
     QVector3D center;
     double sphereBoundDistance;
+    void Draw(QOpenGLShaderProgram *program);
 
 
 };

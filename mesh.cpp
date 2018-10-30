@@ -1,9 +1,16 @@
 #include "mesh.h"
 #include <iostream>
 #include <QFile>
-//#include <QOpenGLFunctions>
-#include <QOpenGLShaderProgram>
-//#include <QOpenGLBuffer>
+#include <QOpenGLFunctions>
+
+struct VertexData
+{
+    QVector3D position;
+    QVector2D texCoord;
+    QVector3D normal;
+    QVector3D color;
+};
+
 
 Mesh3D::Mesh3D()
 {
@@ -22,7 +29,6 @@ void Mesh3D::Load(const char *fileName)
     std::vector<QVector3D> temp_vertices;
     std::vector<QVector2D> temp_uvs;
     std::vector<QVector3D> temp_normals;
-    //QFile file("C:/Users/Maxime/Documents/ProjectMDJ/sphere.obj");
     QFile file(fileName);
     file.open(QFile::ReadOnly);
 
@@ -30,8 +36,6 @@ void Mesh3D::Load(const char *fileName)
     {
         std::cout<<"Impossible to open the file !\n"<< std::endl;
     }
-
-    std::cout<<"Modele chargée !!!!" << std::endl;
     int done = 1;
     while( done )
     {
@@ -98,6 +102,7 @@ void Mesh3D::Load(const char *fileName)
             normalsIndex.push_back(normalIndex[2]-1);
         }
     }
+    printf("Mesh : %s\n", fileName);
     center/=verticePosition.size();
     sphereBoundDistance = 0;
     for (int i = 0; i < verticePosition.size(); i ++)
@@ -142,3 +147,66 @@ void Mesh3D::Scale(double scale)
     }
 }
 
+void Mesh3D::Draw(QOpenGLShaderProgram *program)
+{
+
+    int j =0;
+    std::vector<VertexData> outVertexData;
+    std::vector<GLushort> outIndexData;
+    for( unsigned int i=0; i < trianglesIndex.size(); i++ )
+    {
+
+        int I = trianglesIndex[i];
+        int J = texturesIndex[i];
+        int K = normalsIndex[i];
+       QVector3D vertex = verticePosition[ I ];
+       QVector2D texture = texturePosition[ J ];
+       QVector3D normal = normals[K];
+       QVector3D color = QVector3D(1,1,1);
+       //printf("3D<%d,%d,%d>\n",normal.x(), normal.y(), normal.z());
+       outVertexData.push_back( {vertex, texture,normal,color});
+       outIndexData.push_back(i);
+
+
+    }
+    QOpenGLBuffer arrayBuf;
+    QOpenGLBuffer indexBuf(QOpenGLBuffer::IndexBuffer);
+    initializeOpenGLFunctions();
+    arrayBuf.create();
+    indexBuf.create();
+
+    arrayBuf.bind();
+    arrayBuf.allocate(outVertexData.data(), outVertexData.size() * sizeof(VertexData));
+
+    // Transfer index data to VBO 1
+    indexBuf.bind();
+    indexBuf.allocate(outIndexData.data(), outIndexData.size() * sizeof(GLushort));
+
+    quintptr offset = 0;
+    //program->setAttributeValue(program->attributeLocation("snow"), snow);
+    int vertexLocation = program->attributeLocation("a_position");
+    program->enableAttributeArray(vertexLocation);
+    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+    offset += sizeof(QVector3D);
+
+    int texcoordLocation = program->attributeLocation("a_texcoord");
+    program->enableAttributeArray(texcoordLocation);
+    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+    offset += sizeof(QVector2D);
+
+    int normalLocation = program->attributeLocation("a_normal");
+    program->enableAttributeArray(normalLocation);
+    program->setAttributeBuffer(normalLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+    //meshes[m].texture->bind();
+
+    offset += sizeof(QVector3D);
+
+    int colorLocation = program->attributeLocation("a_color");
+    program->enableAttributeArray(colorLocation);
+    program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+    texture->bind();
+
+    glDrawElements(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr);
+}

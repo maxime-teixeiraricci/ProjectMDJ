@@ -52,6 +52,8 @@
 
 #include <QMouseEvent>
 #include <iostream>
+#include <collider.h>
+
 //#include <math.h>
 
 MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
@@ -65,6 +67,8 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
 {
     timeFrequence = 1.0/frequence*1000;
     season = seasonStart;
+    z = 0;
+
 
 }
 
@@ -165,6 +169,18 @@ void MainWidget::initializeGL()
 
     // Use QBasicTimer because its faster than QTimer
    timer.start(timeFrequence, this);
+   Mesh3D m1, m2;
+   m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
+   m1.Scale(0.2);
+   m2.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
+   m2.Scale(1.5);
+   m2.Translate(QVector3D(0,1,0));
+   Collider c1(m1), c2(m2);
+   meshes.push_back(m1);
+   meshes.push_back(c1.SphereCollider());
+
+   meshes.push_back(m2);
+   meshes.push_back(c2.SphereCollider());
 }
 
 void MainWidget::seasonChange()
@@ -221,6 +237,8 @@ void MainWidget::initTextures()
         textures[i]->setMagnificationFilter(QOpenGLTexture::Linear);
         textures[i]->setWrapMode(QOpenGLTexture::Repeat);
     }
+
+    m_frameCount = 0 ;
 }
 //! [4]
 
@@ -268,5 +286,28 @@ void MainWidget::paintGL()
     // Draw cube geometry
     //geometries->drawCubeGeometry(&program);
 
-    geometries1->Draw(&program);
+    //geometries1->Draw(&program);
+    if (z==0)
+    {
+
+        z++;
+    }
+    for (int i = 0; i < meshes.size(); i++)
+    {
+        meshes[i].Draw(&program);
+    }
+
+    if (m_frameCount == 0)
+    {
+        m_time.start();
+    }
+    else
+    {
+        printf("FPS is %f\n", m_frameCount / (float(m_time.elapsed()) / 1000.0f));
+    }
+    m_frameCount++;
+
+        // Painting goes here...
+
+
 }

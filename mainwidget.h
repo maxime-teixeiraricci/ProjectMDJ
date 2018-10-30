@@ -63,7 +63,8 @@
 #include <QBasicTimer>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
-
+#include "mesh.h"
+#include "QTime"
 class GeometryEngine;
 
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -76,9 +77,13 @@ public:
     int z = 0;
     int season = 0;
    std::vector<QOpenGLTexture *> textures;
+   std::vector<Mesh3D> meshes;
+   QTime m_time;
+   int m_frameCount;
 
 public slots:
      void seasonChange();
+
 
 protected:
     void mousePressEvent(QMouseEvent *e) override;
