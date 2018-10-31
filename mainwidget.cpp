@@ -115,7 +115,7 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    applicationTime += 0.025 * timeScale;
+    applicationTime += 0.2 * timeScale;
     // Decrease angular speed (friction)
     angularSpeed *= 0.99;
     //angularSpeed =1;
@@ -170,17 +170,23 @@ void MainWidget::initializeGL()
     // Use QBasicTimer because its faster than QTimer
    timer.start(timeFrequence, this);
    Mesh3D m1, m2;
-   m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
-   m1.Scale(0.2);
-   m2.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
-   m2.Scale(1.5);
-   m2.Translate(QVector3D(0,1,0));
-   Collider c1(m1), c2(m2);
-   meshes.push_back(m1);
-   meshes.push_back(c1.SphereCollider());
+   m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
 
-   meshes.push_back(m2);
-   meshes.push_back(c2.SphereCollider());
+
+   GameObject G1(m1), G2(m1), G3(m1), G4(m1);
+   //scene.setRacine(&G1);
+  // scene.addChild(&G1,&G3);
+
+   G1.setRelativePosition(QVector3D(0,0,-1));
+   G2.setRelativePosition(QVector3D(0,0,1));
+   G1.addChild(&G2);
+
+   gameObjects.push_back(G1);
+   gameObjects.push_back(*(G1.getChilds()[0]));
+   //gameObjects.push_back(G3);
+   //gameObjects.push_back(G4);
+
+
 }
 
 void MainWidget::seasonChange()
@@ -287,27 +293,11 @@ void MainWidget::paintGL()
     //geometries->drawCubeGeometry(&program);
 
     //geometries1->Draw(&program);
-    if (z==0)
-    {
 
-        z++;
-    }
-    for (int i = 0; i < meshes.size(); i++)
+    for (int i = 0; i < gameObjects.size(); i++)
     {
-        meshes[i].Draw(&program);
-    }
+        gameObjects[i].Draw(&program);
 
-    if (m_frameCount == 0)
-    {
-        m_time.start();
     }
-    else
-    {
-        printf("FPS is %f\n", m_frameCount / (float(m_time.elapsed()) / 1000.0f));
-    }
-    m_frameCount++;
-
-        // Painting goes here...
-
 
 }

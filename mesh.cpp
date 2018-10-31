@@ -147,7 +147,7 @@ void Mesh3D::Scale(double scale)
     }
 }
 
-void Mesh3D::Draw(QOpenGLShaderProgram *program)
+void Mesh3D::Draw(QOpenGLShaderProgram *program, QVector3D relativePosition)
 {
 
     int j =0;
@@ -159,7 +159,7 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program)
         int I = trianglesIndex[i];
         int J = texturesIndex[i];
         int K = normalsIndex[i];
-       QVector3D vertex = verticePosition[ I ];
+       QVector3D vertex = verticePosition[ I ]+relativePosition;
        QVector2D texture = texturePosition[ J ];
        QVector3D normal = normals[K];
        QVector3D color = QVector3D(1,1,1);

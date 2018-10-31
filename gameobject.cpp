@@ -5,6 +5,14 @@ GameObject::GameObject()
 
 }
 
+GameObject::GameObject(Mesh3D newMesh)
+{
+    mesh = newMesh;
+    absoluPosition = QVector3D(0,0,0);
+    relativePosition = QVector3D(0,0,0);
+    parent = 0;
+}
+
 GameObject::~GameObject()
 {
 }
@@ -17,7 +25,7 @@ std::vector<GameObject*> GameObject::getChilds(){
     return enfants;
 }
 
-Mesh3D* GameObject::getMesh(){
+Mesh3D GameObject::getMesh(){
     return mesh;
 }
 
@@ -31,19 +39,36 @@ int GameObject::getNbChilds(){
 
 void GameObject::setParent(GameObject* newParent){
     parent = newParent;
+
+
 }
 
-void GameObject::setMesh(Mesh3D* newMesh){
+void GameObject::updateAbsolute()
+{
+    absoluPosition = relativePosition;
+    if (parent)
+    {
+        absoluPosition += parent->absoluPosition;
+    }
+}
+
+void GameObject::setMesh(Mesh3D newMesh){
     mesh = newMesh;
 }
 
 void GameObject::setRelativePosition(QVector3D newRelativePosition){
     relativePosition = newRelativePosition;
+    updateAbsolute();
+
+
+
 }
 
 void GameObject::addChild(GameObject* newChild){
-    enfants.push_back(newChild);
-    nbEnfants++;
+
+   newChild->setParent(this);
+   newChild->updateAbsolute();
+   enfants.push_back(newChild);
 }
 
 uint GameObject::posElmtChilds(GameObject* obj){
@@ -58,4 +83,9 @@ void GameObject::removeChild(GameObject* child){
     nbEnfants--;
 }
 
+void GameObject::Draw(QOpenGLShaderProgram *program)
+{
+    mesh.Draw(program, absoluPosition);
+    //mesh.Draw(program, enfants[0]->absoluPosition);
+}
 

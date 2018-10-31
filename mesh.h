@@ -29,7 +29,7 @@ public:
     QVector3D min;
     QVector3D center;
     double sphereBoundDistance;
-    void Draw(QOpenGLShaderProgram *program);
+    void Draw(QOpenGLShaderProgram *program, QVector3D relativePosition);
 
 
 };

@@ -64,6 +64,8 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include "mesh.h"
+#include "gameobject.h"
+#include "scenegraph.h"
 #include "QTime"
 class GeometryEngine;
 
@@ -77,9 +79,10 @@ public:
     int z = 0;
     int season = 0;
    std::vector<QOpenGLTexture *> textures;
-   std::vector<Mesh3D> meshes;
+   std::vector<GameObject> gameObjects;
    QTime m_time;
    int m_frameCount;
+   SceneGraph scene;
 
 public slots:
      void seasonChange();
