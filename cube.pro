@@ -8,7 +8,8 @@ SOURCES += main.cpp \
     obj_loader.cpp \
     gameobject.cpp \
     scenegraph.cpp \
-    collider.cpp
+    collider.cpp \
+    timer_manager.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -20,7 +21,8 @@ HEADERS += \
     mesh.h \
     gameobject.h \
     scenegraph.h \
-    collider.h
+    collider.h \
+    timer_manager.h
 
 RESOURCES += \
     shaders.qrc \

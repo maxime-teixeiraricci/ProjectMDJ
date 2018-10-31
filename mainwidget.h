@@ -67,6 +67,8 @@
 #include "gameobject.h"
 #include "scenegraph.h"
 #include "QTime"
+#include "timer_manager.h"
+
 class GeometryEngine;
 
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -74,7 +76,7 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit MainWidget(double frequence, int seasonStart, QWidget *parent = 0);
+    explicit MainWidget(double value, int seasonStart, QWidget *parent = 0);
     ~MainWidget();
     int z = 0;
     int season = 0;
@@ -102,7 +104,7 @@ protected:
     void initTextures();
 
 private:
-    QBasicTimer timer;
+    timer_manager timer;
     QOpenGLShaderProgram program;
     GeometryEngine *geometries1;
     GeometryEngine *geometries2;
