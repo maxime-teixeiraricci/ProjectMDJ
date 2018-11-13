@@ -14,6 +14,7 @@ public:
     Mesh3D();
     void Translate(QVector3D vector);
     void Scale(double scale);
+    void Rotate(QQuaternion rotate);
     void Load(const char *fileName);
 
     QOpenGLTexture *texture;

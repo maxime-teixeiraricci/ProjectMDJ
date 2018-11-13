@@ -2,6 +2,7 @@
 #include <iostream>
 #include <QFile>
 #include <QOpenGLFunctions>
+#include <QGenericMatrix>
 
 struct VertexData
 {
@@ -122,6 +123,31 @@ void Mesh3D::Translate(QVector3D vector)
     max += vector;
     min += vector;
     center += vector;
+    sphereBoundDistance = 0;
+    for (int i = 0; i < verticePosition.size(); i ++)
+    {
+        double d = (center-verticePosition[i]).length();
+        if (d > sphereBoundDistance) sphereBoundDistance = d;
+    }
+}
+
+void Mesh3D::Rotate(QQuaternion rotation)
+{
+    for (int i = 0; i < verticePosition.size(); i ++)
+    {
+        QGenericMatrix<1,3, float> m1;
+        m1(0, 0) = verticePosition[i].x();
+        m1(0, 1) = verticePosition[i].y();
+        m1(0, 2) = verticePosition[i].z();
+
+        QGenericMatrix<3,3, float> m2(rotation.toRotationMatrix());
+
+
+
+        QGenericMatrix<1,3,float> result = m2 * m1;
+
+        //verticePosition[i] = ;
+    }
     sphereBoundDistance = 0;
     for (int i = 0; i < verticePosition.size(); i ++)
     {

@@ -49,26 +49,27 @@
 ****************************************************************************/
 
 #include "mainwidget.h"
-#include "timer_manager.h"
+
 #include <QMouseEvent>
 #include <iostream>
 #include <collider.h>
-#include <QLabel>
-#include <QHBoxLayout>
+
 //#include <math.h>
 
-MainWidget::MainWidget(double value, int seasonStart,QWidget *parent) :
+MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     QOpenGLWidget(parent),
     geometries1(0),
     geometries2(0),
     texture(0),
     angularSpeed(0),
-    timeScale(1.0f),
-    timer(value)
+    timeScale(1.0f)
 
 {
+    timeFrequence = 1.0/frequence*1000;
     season = seasonStart;
     z = 0;
+
+
 }
 
 MainWidget::~MainWidget()
@@ -87,6 +88,16 @@ void MainWidget::mousePressEvent(QMouseEvent *e)
 {
     // Save mouse press position
     mousePressPosition = QVector2D(e->localPos());
+}
+
+void MainWidget::DrawMesh(GameObject *gameObject)
+{
+    gameObject->Draw(&program);
+    for (unsigned int i = 0; i < gameObject->numberChildren();i++)
+    {
+       gameObject->getChild(i)->Draw(&program);
+    }
+
 }
 
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
@@ -167,50 +178,28 @@ void MainWidget::initializeGL()
     geometries2 = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-   timer.startTimer(this);
-
-   // Affichage du label
-   QLabel *label = new QLabel(this);
-   QHBoxLayout *layout = new QHBoxLayout();
-   label->setText("Random String");
-   layout->addWidget(label);
-   setLayout(layout);
-
-
+   timer.start(timeFrequence, this);
    Mesh3D m1, m2;
-<<<<<<< HEAD
    m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
 
-
-   GameObject G1(m1), G2(m1), G3(m1), G4(m1);
+   gravity.gravity = QVector3D(0,0,-0.2f);
+   GameObject *G1 = new GameObject(m1);
+   GameObject *G2 = new GameObject(m1);
+   GameObject *G3 = new GameObject(m1);
+   GameObject *G4 = new GameObject(m1);
    //scene.setRacine(&G1);
   // scene.addChild(&G1,&G3);
 
-   G1.setRelativePosition(QVector3D(0,0,-1));
-   G2.setRelativePosition(QVector3D(0,0,1));
-   G1.addChild(&G2);
+   G1->SetPosition( QVector3D(1,0,0));
+   G2->SetPosition( QVector3D(-1,0,0));
+   G3->SetPosition( QVector3D(0,0,1));
+   G4->SetPosition( QVector3D(1,0,1));
+   G1->addChild(G2);
+   G2->addChild(G3);
 
    gameObjects.push_back(G1);
-   gameObjects.push_back(*(G1.getChilds()[0]));
-   //gameObjects.push_back(G3);
-   //gameObjects.push_back(G4);
-
-
-=======
-   //m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
-   m1.Load("C:/Users/fumey/Desktop/ProjetMDJ/ProjectMDJ/Stage1.obj");
-   m1.Scale(0.2);
-   //m2.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
-   m2.Load("C:/Users/fumey/Desktop/ProjetMDJ/ProjectMDJ/cube.obj");
-   m2.Scale(1.5);
-   m2.Translate(QVector3D(0,1,0));
-   Collider c1(m1), c2(m2);
-   meshes.push_back(m1);
-   meshes.push_back(c1.SphereCollider());
-
-   meshes.push_back(m2);
-   meshes.push_back(c2.SphereCollider());
->>>>>>> c936f4259425bc2959c84a8eafa610fe9b113c1c
+   gameObjects.push_back(G4);
+   m_time.start();
 }
 
 void MainWidget::seasonChange()
@@ -302,7 +291,7 @@ void MainWidget::paintGL()
     //matrix.translate(0.0, 0, .0);
     //matrix.rotate(rotation);
 
-    matrix.lookAt(QVector3D(5*sin(applicationTime),5*cos(applicationTime),3), // Eye
+    matrix.lookAt(QVector3D(0,4,3), // Eye
                   QVector3D(0,0,0), // Center
                   QVector3D(0,0,1)); // Normal
 
@@ -313,15 +302,13 @@ void MainWidget::paintGL()
     // Use texture unit 0 which contains cube.png
     program.setUniformValue("texture", 0);
 
-    // Draw cube geometry
-    //geometries->drawCubeGeometry(&program);
-
-    //geometries1->Draw(&program);
-
     for (int i = 0; i < gameObjects.size(); i++)
     {
-        gameObjects[i].Draw(&program);
-
+        gameObjects[i]->Draw(&program);
     }
+    //std::cout << "Secs since start : " << m_time.elapsed()/1000.0f << std::endl;
+    std::cout << "FPS : " << 1.0f/(m_time.elapsed()/1000.0f) << std::endl;
+    gravity.ApplyGravity(gameObjects[0]->getChild(0));
+    m_time.restart();
 
 }

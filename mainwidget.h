@@ -65,10 +65,9 @@
 #include <QOpenGLTexture>
 #include "mesh.h"
 #include "gameobject.h"
-#include "scenegraph.h"
 #include "QTime"
 #include "timer_manager.h"
-
+#include "gravity.h"
 class GeometryEngine;
 
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -81,10 +80,12 @@ public:
     int z = 0;
     int season = 0;
    std::vector<QOpenGLTexture *> textures;
-   std::vector<GameObject> gameObjects;
+   std::vector<GameObject *> gameObjects;
    QTime m_time;
    int m_frameCount;
-   SceneGraph scene;
+   void DrawMesh(GameObject *gameObject);
+   Gravity gravity;
+
 
 public slots:
      void seasonChange();
@@ -104,7 +105,7 @@ protected:
     void initTextures();
 
 private:
-    timer_manager timer;
+    QBasicTimer  timer;
     QOpenGLShaderProgram program;
     GeometryEngine *geometries1;
     GeometryEngine *geometries2;

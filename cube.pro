@@ -7,9 +7,9 @@ SOURCES += main.cpp \
     mesh.cpp \
     obj_loader.cpp \
     gameobject.cpp \
-    scenegraph.cpp \
     collider.cpp \
-    timer_manager.cpp
+    timer_manager.cpp \
+    gravity.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -20,9 +20,9 @@ HEADERS += \
     geometryengine.h \
     mesh.h \
     gameobject.h \
-    scenegraph.h \
     collider.h \
-    timer_manager.h
+    timer_manager.h \
+    gravity.h
 
 RESOURCES += \
     shaders.qrc \
