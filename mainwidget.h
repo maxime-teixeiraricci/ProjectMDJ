@@ -120,11 +120,12 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
-    QColor seasonColor;
+
     QColor *seasonColors = new QColor[4]{QColor(194,249,113),
                                         QColor(240,216,140),
                                         QColor(231,162,150),
                                         QColor(216,216,216)};
+    GameObject *skybox = 0;
 
     double time;
     double timeScale;

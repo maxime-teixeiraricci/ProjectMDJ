@@ -1,0 +1,9 @@
+diff a/mainwidget.cpp b/mainwidget.cpp	(rejected hunks)
+@@ -254,6 +254,7 @@
+     //matrix.translate(0.0, 0, .0);
+     //matrix.rotate(rotation);
+ 
++    matrix.lookAt(QVector3D(5*sin(applicationTime),5*cos(applicationTime),3), // Eye
+                   QVector3D(0,0,0), // Center
+                   QVector3D(0,0,1)); // Normal
+ 
