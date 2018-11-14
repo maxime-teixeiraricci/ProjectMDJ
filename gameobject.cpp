@@ -1,30 +1,33 @@
 #include "gameobject.h"
+#include <collider.h>
 
-
-GameObject::GameObject(Mesh3D newMesh)
+GameObject::GameObject(Mesh3D *newMesh)
 {
     mesh = newMesh;
     this->position = QVector3D(0,0,0);
     this->scale = QVector3D(1,1,1);
     this->rotation = QVector4D(0,0,0,1);
+    collider = new Collider(newMesh);
 }
 
-GameObject::GameObject(Mesh3D newMesh, GameObject* parent)
+GameObject::GameObject(Mesh3D *newMesh, GameObject* parent)
 {
     //mesh = newMesh;
     position = QVector3D(0,0,0);
     scale = QVector3D(1,1,1);
     rotation = QVector4D(0,0,0,1);
     setParent(parent);
+    collider = new Collider(newMesh);
 }
 
-GameObject::GameObject(Mesh3D newMesh, QVector3D position)
+GameObject::GameObject(Mesh3D *newMesh, QVector3D position)
 {
     mesh = newMesh;
     this->position = position;
     this->scale = QVector3D(1,1,1);
     this->rotation = QVector4D(0,0,0,1);
     this->setParent(parent);
+    collider = new Collider(newMesh);
 }
 
 
@@ -43,7 +46,7 @@ GameObject* GameObject::getChild(int index)
     return children.at(index);
 }
 
-Mesh3D GameObject::getMesh()
+Mesh3D* GameObject::getMesh()
 {
     return mesh;
 }
@@ -59,7 +62,7 @@ int GameObject::numberChildren()
     return children.size();
 }
 
-void GameObject::setMesh(Mesh3D newMesh)
+void GameObject::setMesh(Mesh3D* newMesh)
 {
     mesh = newMesh;
 }
@@ -71,7 +74,7 @@ void GameObject::addChild(GameObject* newChild)
 
 void GameObject::Draw(QOpenGLShaderProgram *program, QVector3D parentPosition)
 {
-    mesh.Draw(program, position +parentPosition);
+    mesh->Draw(program, position +parentPosition);
     for (unsigned int child = 0 ; child < children.size(); child ++)
     {
        getChild(child)->Draw(program, position + parentPosition);
@@ -85,6 +88,13 @@ void GameObject::Draw(QOpenGLShaderProgram *program)
 
 void GameObject::SetPosition(QVector3D newPosition)
 {
+
+    mesh->Translate(newPosition - position);
     position = newPosition;
+    mesh->origin = newPosition;
 }
 
+QVector3D GameObject::GetPosition()
+{
+    return position;
+}

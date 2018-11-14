@@ -179,26 +179,27 @@ void MainWidget::initializeGL()
 
     // Use QBasicTimer because its faster than QTimer
    timer.start(timeFrequence, this);
-   Mesh3D m1, m2;
-   m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
+   Mesh3D *m1 = new Mesh3D();
+   Mesh3D *m2 = new Mesh3D();
+   m1->Load("C:/Users/Maxime/Documents/ProjectMDJ/slope.obj");
+   m2->Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
 
-   gravity.gravity = QVector3D(0,0,-0.2f);
+   m1->test = 111;
+   m2->test = 222;
+
+   gravity.gravity = QVector3D(0,0,-0.25f);
    GameObject *G1 = new GameObject(m1);
-   GameObject *G2 = new GameObject(m1);
-   GameObject *G3 = new GameObject(m1);
-   GameObject *G4 = new GameObject(m1);
+   GameObject *G2 = new GameObject(m2);
+   /*GameObject *G3 = new GameObject(m1);
+   GameObject *G4 = new GameObject(m1);*/
    //scene.setRacine(&G1);
   // scene.addChild(&G1,&G3);
 
-   G1->SetPosition( QVector3D(1,0,0));
-   G2->SetPosition( QVector3D(-1,0,0));
-   G3->SetPosition( QVector3D(0,0,1));
-   G4->SetPosition( QVector3D(1,0,1));
-   G1->addChild(G2);
-   G2->addChild(G3);
+   G1->SetPosition( QVector3D(0,0,0));
+   G2->SetPosition( QVector3D(2.5,0,2.5));
 
    gameObjects.push_back(G1);
-   gameObjects.push_back(G4);
+   gameObjects.push_back(G2);
    m_time.start();
 }
 
@@ -268,7 +269,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 15.0, fov = 40.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -291,7 +292,7 @@ void MainWidget::paintGL()
     //matrix.translate(0.0, 0, .0);
     //matrix.rotate(rotation);
 
-    matrix.lookAt(QVector3D(0,4,3), // Eye
+    matrix.lookAt(QVector3D(0,8,3), // Eye
                   QVector3D(0,0,0), // Center
                   QVector3D(0,0,1)); // Normal
 
@@ -306,9 +307,17 @@ void MainWidget::paintGL()
     {
         gameObjects[i]->Draw(&program);
     }
-    //std::cout << "Secs since start : " << m_time.elapsed()/1000.0f << std::endl;
     std::cout << "FPS : " << 1.0f/(m_time.elapsed()/1000.0f) << std::endl;
-    gravity.ApplyGravity(gameObjects[0]->getChild(0));
+    if(!gameObjects[1]->collider->IsCollide(gameObjects[0]->collider) && gameObjects[1]->position.z() > -2)
+    {
+        gravity.ApplyGravity(gameObjects[1]);
+    }
+    else
+    {
+        gameObjects[1]->SetPosition(QVector3D(gameObjects[1]->position.x(),0,2.5));
+        gameObjects[1]->SetPosition(gameObjects[1]->position + QVector3D(-0.25,0,0));
+    }
+
     m_time.restart();
 
 }

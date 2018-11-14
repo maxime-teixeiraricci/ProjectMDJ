@@ -71,7 +71,7 @@ struct VertexData
 GeometryEngine::GeometryEngine()
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
-    Mesh3D m1, m2;
+   /* Mesh3D m1, m2;
     m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
     m1.Scale(0.2);
     m2.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
@@ -83,7 +83,7 @@ GeometryEngine::GeometryEngine()
 
     meshes.push_back(m2);
     meshes.push_back(c2.SphereCollider());
-
+*/
     initializeOpenGLFunctions();
     arrayBuf.create();
     indexBuf.create();
