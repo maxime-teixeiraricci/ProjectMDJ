@@ -69,6 +69,7 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     season = seasonStart;
     z = 0;
     inputMapping = InputMapping();
+    setMouseTracking(true);
 
 
 }
@@ -86,6 +87,12 @@ MainWidget::~MainWidget()
 
 bool MainWidget::event(QEvent *event)
 {
+    QMapIterator<QString, float> i(inputMapping.inputMap);
+    while (i.hasNext()) {
+        i.next();
+        inputMapping.inputMap[i.key()] = 0;
+    }
+
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
         if (ke->key() == Qt::Key_Z) {
