@@ -116,10 +116,8 @@ void Mesh3D::Load(const char *fileName)
 
 void Mesh3D::Translate(QVector3D vector)
 {
-    for (int i = 0; i < verticePosition.size(); i ++)
-    {
-        verticePosition[i] = verticePosition[i] + vector;
-    }
+
+
     max += vector;
     min += vector;
     center += vector;
@@ -189,7 +187,7 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program, QVector3D relativePosition)
        QVector2D texture = texturePosition[ J ];
        QVector3D normal = normals[K];
        QVector3D color = QVector3D(1,1,1);
-       //printf("3D<%d,%d,%d>\n",normal.x(), normal.y(), normal.z());
+       printf("3D<%f,%f,%f>\n",vertex.x(), vertex.y(), vertex.z());
        outVertexData.push_back( {vertex, texture,normal,color});
        outIndexData.push_back(i);
 
@@ -235,4 +233,34 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program, QVector3D relativePosition)
     texture->bind();
 
     glDrawElements(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr);
+}
+
+void Mesh3D::KDopCompute()
+{
+    /* {1,1,0},	{-1,1,0},{1,-1,0},{-1,-1,0},{1,	0,1},{-1,0,1},{1,0,-1},{-1,0,-1},{0,1,1},{0,-1,1},{0,1,-1},{0,-1,-1} */
+    std::vector<QVector3D> axis = {QVector3D(1,1,0),QVector3D(-1,1,0),QVector3D(1,-1,0),QVector3D(-1,-1,0),
+                                  QVector3D(1,0,1),QVector3D(-1,0,1),QVector3D(1,0,-1),QVector3D(-1,0,-1),
+                                  QVector3D(0,1,1),QVector3D(0,-1,1),QVector3D(0,1,-1),QVector3D(0,-1,-1)};
+
+    kdopMax = {};
+    kdopMin = {};
+    for (unsigned int v = 0; v < verticePosition.size(); v ++)
+    {
+        QVector3D vertex = verticePosition[v] + origin;
+        for (unsigned int i = 0; i < axis.size(); i ++)
+        {
+            float fScore = axis[i].normalized().x() * vertex.x() + axis[i].normalized().y() * vertex.y() +axis[i].normalized().z() * vertex.z();
+            if (v == 0)
+            {
+                kdopMax.push_back(fScore);
+                kdopMin.push_back(fScore);
+            }
+            else
+            {
+                kdopMax[i] = std::max(kdopMax[i],fScore);
+                kdopMin[i] = std::min(kdopMin[i],fScore);
+            }
+        }
+    }
+
 }

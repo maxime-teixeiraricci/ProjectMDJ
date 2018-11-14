@@ -7,6 +7,7 @@
 #include <QOpenGLFunctions>
 
 #include <QOpenGLBuffer>
+//#include <collider.h>
 
 class Mesh3D : protected QOpenGLFunctions
 {
@@ -28,9 +29,15 @@ public:
 
     QVector3D max;
     QVector3D min;
+    std::vector<float> kdopMax;
+    std::vector<float> kdopMin;
     QVector3D center;
     double sphereBoundDistance;
     void Draw(QOpenGLShaderProgram *program, QVector3D relativePosition);
+
+    void KDopCompute();
+    QVector3D origin;
+    int test;
 
 
 };

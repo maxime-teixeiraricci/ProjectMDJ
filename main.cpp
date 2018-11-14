@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("cube");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget1(60,0);
+    MainWidget widget1(20,0);
     MainWidget widget2(50,1);
     MainWidget widget3(50,2);
     MainWidget widget4(50,3);
