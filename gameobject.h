@@ -33,11 +33,12 @@ public:
     QVector3D scale;
     QVector4D rotation; // Quaternion <3
     Collider* collider;
+    Mesh3D *mesh;
 
 private:
     GameObject* parent;
     std::vector<GameObject*> children;
-    Mesh3D *mesh;
+
 
 
 };

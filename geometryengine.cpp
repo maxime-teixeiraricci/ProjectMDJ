@@ -71,7 +71,7 @@ struct VertexData
 GeometryEngine::GeometryEngine()
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
-    Mesh3D m1, m2;
+   /* Mesh3D m1, m2;
     m1.Load("C:\\Users\\Mehdi\\Desktop\\Master2\\Moteur de jeu\\Projet\\Stage1.obj");
     m1.Scale(0.2);
     m2.Load("C:\\Users\\Mehdi\\Desktop\\Master2\\Moteur de jeu\\Projet\\cube.obj");
@@ -86,7 +86,7 @@ GeometryEngine::GeometryEngine()
 
     initializeOpenGLFunctions();
     arrayBuf.create();
-    indexBuf.create();
+    indexBuf.create();*/
 }
 
 GeometryEngine::~GeometryEngine()

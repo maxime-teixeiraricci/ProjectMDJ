@@ -250,12 +250,18 @@ void MainWidget::initializeGL()
    gameObjects.push_back(G1);
    gameObjects.push_back(G2);
    m_time.start();
+   seasonChange();
 }
 
 void MainWidget::seasonChange()
 {
    season = (season + 1) % 4;
    seasonColor = seasonColors[season];
+   for (int i =0; i < gameObjects.size(); i ++)
+   {
+       gameObjects[i]->mesh->color = seasonColor;
+   }
+   std::cout << "Season Change !" << std::endl;
 
 }
 

@@ -23,6 +23,7 @@ Mesh3D::Mesh3D()
     texturesIndex={};
     normalsIndex={};
     texture = new QOpenGLTexture(QImage(":/PaletteTest.png").mirrored());
+    color = QColor(255,255,255);
 }
 
 void Mesh3D::Load(const char *fileName)
@@ -186,9 +187,9 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program, QVector3D relativePosition)
        QVector3D vertex = verticePosition[ I ]+relativePosition;
        QVector2D texture = texturePosition[ J ];
        QVector3D normal = normals[K];
-       QVector3D color = QVector3D(1,1,1);
+       QVector3D colorTexture = QVector3D(color.red() /255.0f, color.green()/255.0f, color.blue()/255.0f);
        printf("3D<%f,%f,%f>\n",vertex.x(), vertex.y(), vertex.z());
-       outVertexData.push_back( {vertex, texture,normal,color});
+       outVertexData.push_back( {vertex, texture,normal,colorTexture});
        outIndexData.push_back(i);
 
 

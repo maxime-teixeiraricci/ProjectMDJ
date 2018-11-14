@@ -39,6 +39,8 @@ public:
     QVector3D origin;
     int test;
 
+    QColor color;
+
 
 };
 

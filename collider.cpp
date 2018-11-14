@@ -13,13 +13,10 @@ Collider::Collider(Mesh3D *m)
 
 bool Collider::IsCollide(Collider *target)
 {
-    std::cout << "Sphere" << std::endl;
     if (SphereCollide(target))
     {
-        std::cout << "BBCollide" << std::endl;
         if (BBCollide(target))
         {
-            std::cout << "kdopCollide" << std::endl;
             return kdopCollide(target);
         }
     }

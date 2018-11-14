@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     MainWidget *widget1 = new MainWidget(60,0);
     MainWidget *widget2 = new MainWidget(60,1);
     MainWidget *widget3 = new MainWidget(60,2);
-    MainWidget *widget4 = new MainWidget(60,2);
+    MainWidget *widget4 = new MainWidget(60,3);
 
     //Ajout des 4 widgets au grid Layout
     mainLayout->addWidget(widget1,0,0);
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     QObject::connect(timer, SIGNAL(timeout()), widget3, SLOT(seasonChange()));
     QObject::connect(timer, SIGNAL(timeout()), widget4, SLOT(seasonChange()));
 
-    timer->start(1000);
+    timer->start(2500);
 
     window->setLayout(mainLayout);
     window->showMaximized(); // <- Permet de mettre la fenetre en grand.
