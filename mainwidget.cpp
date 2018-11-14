@@ -206,7 +206,7 @@ void MainWidget::initializeGL()
 void MainWidget::seasonChange()
 {
    season = (season + 1) % 4;
-   texture = textures[season];
+   seasonColor = seasonColors[season];
 
 }
 

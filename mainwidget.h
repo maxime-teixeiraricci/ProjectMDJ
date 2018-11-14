@@ -118,6 +118,8 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+    QColor seasonColor;
+    QColor seasonColors = QColor[4]{};
 
     double time;
     double timeScale;

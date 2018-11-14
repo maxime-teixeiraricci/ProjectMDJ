@@ -55,6 +55,7 @@
 #ifndef QT_NO_OPENGL
 #include "mainwidget.h"
 #include <QTimer>
+#include <QGridLayout>
 #endif
 
 int main(int argc, char *argv[])
@@ -68,29 +69,34 @@ int main(int argc, char *argv[])
     app.setApplicationName("cube");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget1(20,0);
-    MainWidget widget2(50,1);
-    MainWidget widget3(50,2);
-    MainWidget widget4(50,3);
+    // Création du Layout pour mettre les scenes sous forme de grille
+    QGridLayout *mainLayout = new QGridLayout;
+    // Création du widget principal, qui va contenir les 4 autres widgets
+    QWidget *window = new QWidget;
 
-   QTimer *timer1 = new QTimer();
-   QTimer *timer2 = new QTimer();
-    /*QObject::connect(timer1, SIGNAL(timeout()), &widget1, SLOT(seasonChange()));
-    QObject::connect(timer1, SIGNAL(timeout()), &widget2, SLOT(seasonChange()));
-    QObject::connect(timer1, SIGNAL(timeout()), &widget3, SLOT(seasonChange()));
-    QObject::connect(timer1, SIGNAL(timeout()), &widget4, SLOT(seasonChange()));*/
+    //Création des 4 widgets;
+    MainWidget *widget1 = new MainWidget(60,0);
+    MainWidget *widget2 = new MainWidget(60,1);
+    MainWidget *widget3 = new MainWidget(60,2);
+    MainWidget *widget4 = new MainWidget(60,2);
 
-    app.setApplicationName("Plane 1");
-    widget1.show();
-    app.setApplicationName("Plane 2");
-   // widget2.show();
-    app.setApplicationName("Plane 3");
-  //  widget3.show();
-    app.setApplicationName("Plane 4");
-  //  widget4.show();
-    timer1->start(1000);
-   // timer2->start(2000);
+    //Ajout des 4 widgets au grid Layout
+    mainLayout->addWidget(widget1,0,0);
+    mainLayout->addWidget(widget2,1,0);
+    mainLayout->addWidget(widget3,1,1);
+    mainLayout->addWidget(widget4,0,1);
 
+    //Timer permettant de faire changer les saisons
+    QTimer *timer = new QTimer();
+    QObject::connect(timer, SIGNAL(timeout()), widget1, SLOT(seasonChange()));
+    QObject::connect(timer, SIGNAL(timeout()), widget2, SLOT(seasonChange()));
+    QObject::connect(timer, SIGNAL(timeout()), widget3, SLOT(seasonChange()));
+    QObject::connect(timer, SIGNAL(timeout()), widget4, SLOT(seasonChange()));
+
+    timer->start(1000);
+
+    window->setLayout(mainLayout);
+    window->showMaximized(); // <- Permet de mettre la fenetre en grand.
 #else
     QLabel note("OpenGL Support required");
     note.show();
