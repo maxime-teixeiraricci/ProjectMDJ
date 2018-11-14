@@ -72,6 +72,7 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     setMouseTracking(true);
 
 
+
 }
 
 MainWidget::~MainWidget()
@@ -122,8 +123,8 @@ bool MainWidget::event(QEvent *event)
         }
     } else if (event->type() == QEvent::MouseMove) {
         QMouseEvent *mouse = static_cast<QMouseEvent *>(event);
-        inputMapping.inputMap["axisHori"] = 1;
-        inputMapping.inputMap["axisVerti"] = 1;
+        inputMapping.inputMap["axisHori"] = mouse->x()/(width()*1.0);
+        inputMapping.inputMap["axisVerti"] = mouse->y()/(height()*1.0);
         inputMapping.printMap();
         return true;
     }
