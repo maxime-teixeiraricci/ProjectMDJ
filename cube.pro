@@ -9,7 +9,9 @@ SOURCES += main.cpp \
     gameobject.cpp \
     collider.cpp \
     timer_manager.cpp \
-    gravity.cpp
+    gravity.cpp \
+    inputmapping.cpp \
+    camera.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -22,7 +24,9 @@ HEADERS += \
     gameobject.h \
     collider.h \
     timer_manager.h \
-    gravity.h
+    gravity.h \
+    inputmapping.h \
+    camera.h
 
 RESOURCES += \
     shaders.qrc \

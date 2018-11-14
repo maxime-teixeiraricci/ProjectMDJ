@@ -68,6 +68,7 @@
 #include "QTime"
 #include "timer_manager.h"
 #include "gravity.h"
+#include "inputmapping.h"
 class GeometryEngine;
 
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -92,6 +93,7 @@ public slots:
 
 
 protected:
+    bool event(QEvent *event) override;
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
     void keyPressEvent(QKeyEvent *event) override;
@@ -123,6 +125,7 @@ private:
     double timeScale;
     double applicationTime;
     double timeFrequence;
+    InputMapping inputMapping;
 };
 
 #endif // MAINWIDGET_H

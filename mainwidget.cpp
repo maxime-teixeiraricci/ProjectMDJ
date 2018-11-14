@@ -68,6 +68,7 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     timeFrequence = 1.0/frequence*1000;
     season = seasonStart;
     z = 0;
+    inputMapping = InputMapping();
 
 
 }
@@ -81,6 +82,46 @@ MainWidget::~MainWidget()
     delete geometries1;
     delete geometries2;
     doneCurrent();
+}
+
+bool MainWidget::event(QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+        if (ke->key() == Qt::Key_Z) {
+            inputMapping.inputMap["up"] = 1;
+            inputMapping.printMap();
+            return true;
+        }else if (ke->key() == Qt::Key_Q) {
+            inputMapping.inputMap["right"] = 1;
+            inputMapping.printMap();
+            return true;
+        }else if (ke->key() == Qt::Key_S) {
+            inputMapping.inputMap["down"] = 1;
+            inputMapping.printMap();
+            return true;
+        }else if (ke->key() == Qt::Key_D) {
+            inputMapping.inputMap["left"] = 1;
+            inputMapping.printMap();
+            return true;
+        }else if (ke->key() == Qt::Key_Space) {
+            inputMapping.inputMap["jump"] = 1;
+            inputMapping.printMap();
+            return true;
+        }else if (ke->key() == Qt::Key_E) {
+            inputMapping.inputMap["gravity"] = 1;
+            inputMapping.printMap();
+            return true;
+        }
+    } else if (event->type() == QEvent::MouseMove) {
+        QMouseEvent *mouse = static_cast<QMouseEvent *>(event);
+        inputMapping.inputMap["axisHori"] = 1;
+        inputMapping.inputMap["axisVerti"] = 1;
+        inputMapping.printMap();
+        return true;
+    }
+
+    return QWidget::event(event);
 }
 
 //! [0]

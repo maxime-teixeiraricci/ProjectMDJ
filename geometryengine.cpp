@@ -72,9 +72,9 @@ GeometryEngine::GeometryEngine()
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
     Mesh3D m1, m2;
-    m1.Load("C:/Users/Maxime/Documents/ProjectMDJ/Stage1.obj");
+    m1.Load("C:\\Users\\Mehdi\\Desktop\\Master2\\Moteur de jeu\\Projet\\Stage1.obj");
     m1.Scale(0.2);
-    m2.Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
+    m2.Load("C:\\Users\\Mehdi\\Desktop\\Master2\\Moteur de jeu\\Projet\\cube.obj");
     m2.Scale(1.5);
     m2.Translate(QVector3D(0,1,0));
     Collider c1(m1), c2(m2);
