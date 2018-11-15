@@ -217,21 +217,36 @@ void MainWidget::initializeGL()
    Mesh3D *m1 = new Mesh3D();
    Mesh3D *m2 = new Mesh3D();
    Mesh3D *m3 = new Mesh3D();
+   Mesh3D *m4 = new Mesh3D();
    m1->Load("C:/Users/Maxime/Documents/ProjectMDJ/slope.obj");
    m2->Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
    m3->Load("C:/Users/Maxime/Documents/ProjectMDJ/skybox.obj");
+   // Test LOD :
+   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD0.obj",0);
+   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD1.obj",1);
+   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD2.obj",2);
+   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD3.obj",3);
+   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD4.obj",4);
+   //
+
+
+   //
    m3->texture = new QOpenGLTexture(QImage(":/Daylight Box UV.png").mirrored());
 
    gravity.gravity = QVector3D(0,0,-0.25f);
    GameObject *G1 = new GameObject(m1);
    GameObject *G2 = new GameObject(m2);
    GameObject *G3 = new GameObject(m3);
+   GameObject *G4 = new GameObject(m4);
 
    G1->SetPosition( QVector3D(0,0,0));
    G2->SetPosition( QVector3D(2.5,0,2.5));
 
+   G4->SetPosition( QVector3D(0,0,5));
+
    gameObjects.push_back(G1);
    gameObjects.push_back(G2);
+   gameObjects.push_back(G4);
    skybox = G3;
    m_time.start();
    seasonChange();
@@ -245,6 +260,7 @@ void MainWidget::seasonChange()
    {
        gameObjects[i]->mesh->color = seasonColor;
    }
+   gameObjects[2]->mesh->lodIndex = (gameObjects[2]->mesh->lodIndex + 1 ) % 5;
    std::cout << "Season Change !" << std::endl;
 
 }

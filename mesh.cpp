@@ -15,19 +15,28 @@ struct VertexData
 
 Mesh3D::Mesh3D()
 {
-   verticePosition ={};
+   /*verticePosition ={};
     texturePosition={};
     normals={};
 
     trianglesIndex={};
     texturesIndex={};
-    normalsIndex={};
+    normalsIndex={};*/
     texture = new QOpenGLTexture(QImage(":/PaletteTest.png").mirrored());
     color = QColor(255,255,255);
+    lodIndex = 0;
 }
 
 void Mesh3D::Load(const char *fileName)
 {
+    Load(fileName,0);
+}
+
+
+void Mesh3D::Load(const char *fileName, int LODIndex)
+{
+    MeshIdentity *lod = new MeshIdentity();
+
     std::vector<QVector3D> temp_vertices;
     std::vector<QVector2D> temp_uvs;
     std::vector<QVector3D> temp_normals;
@@ -66,14 +75,14 @@ void Mesh3D::Load(const char *fileName)
             if (min.y()> Y) min.setY(Y);
             if (min.z()> Z) min.setZ(Z);
             center += vertex;
-            verticePosition.push_back(vertex);
+            lod->verticePosition.push_back(vertex);
         }else if ( lineHeader[0] == 'v' && lineHeader[1] == 't'){
             float X,Y;
             QVector2D uv;
             sscanf_s(lineHeader, "vt %f %f\n", &X, &Y );
             uv.setX(X);
             uv.setY(Y);
-            texturePosition.push_back(uv);
+            lod->texturePosition.push_back(uv);
         }else if ( lineHeader[0] == 'v' && lineHeader[1] == 'n'){
             float X,Y,Z;
             QVector3D normal;
@@ -81,7 +90,7 @@ void Mesh3D::Load(const char *fileName)
             normal.setX(X);
             normal.setY(Y);
             normal.setZ(Z);
-            normals.push_back(normal);
+            lod->normals.push_back(normal);
         }else if ( lineHeader[0] == 'f' )
         {
             std::string vertex1, vertex2, vertex3;
@@ -93,51 +102,53 @@ void Mesh3D::Load(const char *fileName)
             {
                 printf("File can't be read by our simple parser : ( Try exporting with other options\n");
             }
-            trianglesIndex.push_back(vertexIndex[0]-1);
-            trianglesIndex.push_back(vertexIndex[1]-1);
-            trianglesIndex.push_back(vertexIndex[2]-1);
-            texturesIndex    .push_back(uvIndex[0]-1);
-            texturesIndex    .push_back(uvIndex[1]-1);
-            texturesIndex    .push_back(uvIndex[2]-1);
-            normalsIndex.push_back(normalIndex[0]-1);
-            normalsIndex.push_back(normalIndex[1]-1);
-            normalsIndex.push_back(normalIndex[2]-1);
+            lod->trianglesIndex.push_back(vertexIndex[0]-1);
+            lod->trianglesIndex.push_back(vertexIndex[1]-1);
+            lod->trianglesIndex.push_back(vertexIndex[2]-1);
+            lod->texturesIndex    .push_back(uvIndex[0]-1);
+            lod->texturesIndex    .push_back(uvIndex[1]-1);
+            lod->texturesIndex    .push_back(uvIndex[2]-1);
+            lod->normalsIndex.push_back(normalIndex[0]-1);
+            lod->normalsIndex.push_back(normalIndex[1]-1);
+            lod->normalsIndex.push_back(normalIndex[2]-1);
         }
     }
     printf("Mesh : %s\n", fileName);
-    center/=verticePosition.size();
+    center/=lod->verticePosition.size();
     sphereBoundDistance = 0;
-    for (int i = 0; i < verticePosition.size(); i ++)
+    for (int i = 0; i <lod-> verticePosition.size(); i ++)
     {
-        double d = (center-verticePosition[i]).length();
+        double d = (center - lod->verticePosition[i]).length();
         if (d > sphereBoundDistance) sphereBoundDistance = d;
     }
+
+    meshesLOD.push_back(lod);
 }
 
 
 void Mesh3D::Translate(QVector3D vector)
 {
-
-
+    MeshIdentity *mesh = meshesLOD[lodIndex];
     max += vector;
     min += vector;
     center += vector;
     sphereBoundDistance = 0;
-    for (int i = 0; i < verticePosition.size(); i ++)
+    for (unsigned int i = 0; i < mesh->verticePosition.size(); i ++)
     {
-        double d = (center-verticePosition[i]).length();
+        double d = (center-mesh->verticePosition[i]).length();
         if (d > sphereBoundDistance) sphereBoundDistance = d;
     }
 }
 
 void Mesh3D::Rotate(QQuaternion rotation)
 {
-    for (int i = 0; i < verticePosition.size(); i ++)
+    MeshIdentity *mesh = meshesLOD[lodIndex];
+    for (unsigned int i = 0; i < mesh->verticePosition.size(); i ++)
     {
         QGenericMatrix<1,3, float> m1;
-        m1(0, 0) = verticePosition[i].x();
-        m1(0, 1) = verticePosition[i].y();
-        m1(0, 2) = verticePosition[i].z();
+        m1(0, 0) = mesh->verticePosition[i].x();
+        m1(0, 1) = mesh->verticePosition[i].y();
+        m1(0, 2) = mesh->verticePosition[i].z();
 
         QGenericMatrix<3,3, float> m2(rotation.toRotationMatrix());
 
@@ -148,45 +159,46 @@ void Mesh3D::Rotate(QQuaternion rotation)
         //verticePosition[i] = ;
     }
     sphereBoundDistance = 0;
-    for (int i = 0; i < verticePosition.size(); i ++)
+    for (unsigned int i = 0; i < mesh->verticePosition.size(); i ++)
     {
-        double d = (center-verticePosition[i]).length();
+        double d = (center- mesh->verticePosition[i]).length();
         if (d > sphereBoundDistance) sphereBoundDistance = d;
     }
 }
 
 void Mesh3D::Scale(double scale)
 {
-    for (int i = 0; i < verticePosition.size(); i ++)
+    MeshIdentity *mesh = meshesLOD[lodIndex];
+    for (unsigned int i = 0; i < mesh->verticePosition.size(); i ++)
     {
-        verticePosition[i] = verticePosition[i] * scale;
+        mesh->verticePosition[i] = mesh->verticePosition[i] * scale;
     }
     max *=scale;
     min *=scale;
     center *=scale;
     sphereBoundDistance = 0;
-    for (int i = 0; i < verticePosition.size(); i ++)
+    for (int i = 0; i < mesh->verticePosition.size(); i ++)
     {
-        double d = (center-verticePosition[i]).length();
+        double d = (center- mesh->verticePosition[i]).length();
         if (d > sphereBoundDistance) sphereBoundDistance = d;
     }
 }
 
 void Mesh3D::Draw(QOpenGLShaderProgram *program, QVector3D relativePosition)
 {
-
+    MeshIdentity *mesh = meshesLOD[lodIndex];
     int j =0;
     std::vector<VertexData> outVertexData;
     std::vector<GLushort> outIndexData;
-    for( unsigned int i=0; i < trianglesIndex.size(); i++ )
+    for( unsigned int i=0; i < mesh->trianglesIndex.size(); i++ )
     {
 
-        int I = trianglesIndex[i];
-        int J = texturesIndex[i];
-        int K = normalsIndex[i];
-       QVector3D vertex = verticePosition[ I ]+relativePosition;
-       QVector2D texture = texturePosition[ J ];
-       QVector3D normal = normals[K];
+        int I = mesh->trianglesIndex[i];
+        int J = mesh->texturesIndex[i];
+        int K = mesh->normalsIndex[i];
+       QVector3D vertex = mesh->verticePosition[ I ]+relativePosition;
+       QVector2D texture = mesh->texturePosition[ J ];
+       QVector3D normal = mesh->normals[K];
        QVector3D colorTexture = QVector3D(color.red() /255.0f, color.green()/255.0f, color.blue()/255.0f);
        outVertexData.push_back( {vertex, texture,normal,colorTexture});
        outIndexData.push_back(i);
@@ -237,6 +249,7 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program, QVector3D relativePosition)
 
 void Mesh3D::KDopCompute()
 {
+    MeshIdentity *mesh = meshesLOD[lodIndex];
     /* {1,1,0},	{-1,1,0},{1,-1,0},{-1,-1,0},{1,	0,1},{-1,0,1},{1,0,-1},{-1,0,-1},{0,1,1},{0,-1,1},{0,1,-1},{0,-1,-1} */
     std::vector<QVector3D> axis = {QVector3D(1,1,0),QVector3D(-1,1,0),QVector3D(1,-1,0),QVector3D(-1,-1,0),
                                   QVector3D(1,0,1),QVector3D(-1,0,1),QVector3D(1,0,-1),QVector3D(-1,0,-1),
@@ -244,9 +257,9 @@ void Mesh3D::KDopCompute()
 
     kdopMax = {};
     kdopMin = {};
-    for (unsigned int v = 0; v < verticePosition.size(); v ++)
+    for (unsigned int v = 0; v < mesh->verticePosition.size(); v ++)
     {
-        QVector3D vertex = verticePosition[v] + origin;
+        QVector3D vertex = mesh->verticePosition[v] + origin;
         for (unsigned int i = 0; i < axis.size(); i ++)
         {
             float fScore = axis[i].normalized().x() * vertex.x() + axis[i].normalized().y() * vertex.y() +axis[i].normalized().z() * vertex.z();

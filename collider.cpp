@@ -67,7 +67,7 @@ bool Collider::kdopCollide(Collider *target)
 Mesh3D Collider::SphereCollider()
 {
     Mesh3D m;
-    m.Load("C:/Users/Maxime/Documents/ProjectMDJ/sphere.obj");
+    m.Load("C:/Users/Maxime/Documents/ProjectMDJ/sphere.obj",0);
     m.Scale(mesh->sphereBoundDistance );
     m.Translate(mesh->center);
     return m;

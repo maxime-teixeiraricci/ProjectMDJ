@@ -9,6 +9,19 @@
 #include <QOpenGLBuffer>
 //#include <collider.h>
 
+// Contient les informations d'une Mesh (Nécessaire pour LOD)
+struct MeshIdentity
+{
+    std::vector<QVector3D> verticePosition;
+    std::vector<QVector2D> texturePosition;
+    std::vector<QVector3D> normals;
+    std::vector<QVector3D> color;
+
+    std::vector<int> trianglesIndex;
+    std::vector<int> texturesIndex;
+    std::vector<int> normalsIndex;
+};
+
 class Mesh3D : protected QOpenGLFunctions
 {
 public:
@@ -17,15 +30,14 @@ public:
     void Scale(double scale);
     void Rotate(QQuaternion rotate);
     void Load(const char *fileName);
+    void Load(const char *fileName, int lodIndex);
 
     QOpenGLTexture *texture;
-    std::vector<QVector3D> verticePosition;
-    std::vector<QVector2D> texturePosition;
-    std::vector<QVector3D> normals;
 
-    std::vector<int> trianglesIndex;
-    std::vector<int> texturesIndex;
-    std::vector<int> normalsIndex;
+    // Gestion des LODs
+    std::vector<MeshIdentity *> meshesLOD;
+    unsigned int lodIndex;
+    //
 
     QVector3D max;
     QVector3D min;
