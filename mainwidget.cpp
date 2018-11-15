@@ -242,11 +242,12 @@ void MainWidget::initializeGL()
    G1->SetPosition( QVector3D(0,0,0));
    G2->SetPosition( QVector3D(2.5,0,2.5));
 
-   G4->SetPosition( QVector3D(0,0,5));
+   G4->SetPosition( QVector3D(-5,0,0));
 
+   G2->addChild(G4);
    gameObjects.push_back(G1);
    gameObjects.push_back(G2);
-   gameObjects.push_back(G4);
+   //gameObjects.push_back(G4);
    skybox = G3;
    m_time.start();
    seasonChange();
@@ -260,8 +261,7 @@ void MainWidget::seasonChange()
    {
        gameObjects[i]->mesh->color = seasonColor;
    }
-   gameObjects[2]->mesh->lodIndex = (gameObjects[2]->mesh->lodIndex + 1 ) % 5;
-   std::cout << "Season Change !" << std::endl;
+
 
 }
 
@@ -347,7 +347,8 @@ void MainWidget::paintGL()
     //matrix.translate(0.0, 0, .0);
     //matrix.rotate(rotation);
 
-    matrix.lookAt(QVector3D(20*sin(applicationTime),20*cos(applicationTime),3), // Eye
+    posCamera = QVector3D(20*sin(applicationTime),20*cos(applicationTime),3);
+    matrix.lookAt(posCamera, // Eye
                   QVector3D(0,0,0), // Center
                   QVector3D(0,0,1)); // Normal
 
@@ -378,6 +379,22 @@ void MainWidget::paintGL()
             gameObjects[1]->SetPosition(QVector3D(2.5,0,2.5));
         }
     }
+
+
+    float distanceRatio = (posCamera - gameObjects[1]->getChild(0)->position).length()/30;
+    gameObjects[1]->getChild(0)->mesh->lodIndex = (int) (distanceRatio / 0.25f);
+
+    if (distanceRatio < 0.1f) gameObjects[1]->getChild(0)->mesh->lodIndex = 0;
+    else if (distanceRatio < 0.25f) gameObjects[1]->getChild(0)->mesh->lodIndex = 1;
+    else if (distanceRatio < 0.5f) gameObjects[1]->getChild(0)->mesh->lodIndex = 2;
+    else if (distanceRatio < 0.75f) gameObjects[1]->getChild(0)->mesh->lodIndex = 3;
+    else  gameObjects[1]->getChild(0)->mesh->lodIndex = 4;
+
+    std::cout << "Season Change !" << std::endl;
+
+
+
+
 
     m_time.restart();
 
