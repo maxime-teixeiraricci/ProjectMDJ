@@ -29,8 +29,8 @@ public:
     void Translate(QVector3D vector);
     void Scale(double scale);
     void Rotate(QQuaternion rotate);
-    void Load(const char *fileName);
-    void Load(const char *fileName, int lodIndex);
+    void Load(const QString fileName);
+    void Load(const QString fileName, int lodIndex);
 
     QOpenGLTexture *texture;
 

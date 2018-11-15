@@ -41,4 +41,14 @@ DISTFILES += \
     cube.obj \
     cube.obj \
     cube.obj \
-    ../ProjectMDJ/PaletteTest.png
+    ../ProjectMDJ/PaletteTest.png \
+    cube.obj \
+    skybox.obj \
+    slope.obj \
+    sphere.obj \
+    Stage1.obj \
+    SuzaneLOD0.obj \
+    SuzaneLOD1.obj \
+    SuzaneLOD2.obj \
+    SuzaneLOD3.obj \
+    SuzaneLOD4.obj

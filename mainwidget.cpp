@@ -218,15 +218,15 @@ void MainWidget::initializeGL()
    Mesh3D *m2 = new Mesh3D();
    Mesh3D *m3 = new Mesh3D();
    Mesh3D *m4 = new Mesh3D();
-   m1->Load("C:/Users/Maxime/Documents/ProjectMDJ/slope.obj");
-   m2->Load("C:/Users/Maxime/Documents/ProjectMDJ/cube.obj");
-   m3->Load("C:/Users/Maxime/Documents/ProjectMDJ/skybox.obj");
+   m1->Load("../ProjectMDJ/slope.obj");
+   m2->Load("../ProjectMDJ/cube.obj");
+   m3->Load("../ProjectMDJ/skybox.obj");
    // Test LOD :
-   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD0.obj",0);
-   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD1.obj",1);
-   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD2.obj",2);
-   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD3.obj",3);
-   m4->Load("C:/Users/Maxime/Documents/ProjectMDJ/SuzaneLOD4.obj",4);
+   m4->Load("../ProjectMDJ/SuzaneLOD0.obj",0);
+   m4->Load("../ProjectMDJ/SuzaneLOD1.obj",1);
+   m4->Load("../ProjectMDJ/SuzaneLOD2.obj",2);
+   m4->Load("../ProjectMDJ/SuzaneLOD3.obj",3);
+   m4->Load("../ProjectMDJ/SuzaneLOD4.obj",4);
    //
 
 

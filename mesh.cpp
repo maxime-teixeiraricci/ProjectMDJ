@@ -27,13 +27,13 @@ Mesh3D::Mesh3D()
     lodIndex = 0;
 }
 
-void Mesh3D::Load(const char *fileName)
+void Mesh3D::Load(const QString fileName)
 {
     Load(fileName,0);
 }
 
 
-void Mesh3D::Load(const char *fileName, int LODIndex)
+void Mesh3D::Load(const QString fileName, int LODIndex)
 {
     MeshIdentity *lod = new MeshIdentity();
 
