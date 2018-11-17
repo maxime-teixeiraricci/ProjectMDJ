@@ -5,6 +5,7 @@ InputMapping::InputMapping()
     for (int i = 0; i < list.size(); ++i) {
         inputMap[list[i]] = 0.0;
     }
+    inputMap["cameraZoom"] = 20.0;
 }
 
 void InputMapping::printMap()

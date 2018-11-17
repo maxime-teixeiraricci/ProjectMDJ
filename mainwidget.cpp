@@ -89,55 +89,45 @@ MainWidget::~MainWidget()
 
 bool MainWidget::event(QEvent *event)
 {
-    QMapIterator<QString, float> i(inputMapping->inputMap);
-    while (i.hasNext()) {
-        i.next();
-        inputMapping->inputMap[i.key()] = 0;
-    }
 
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
-        if (ke->key() == Qt::Key_Z) {
-            inputMapping->inputMap["up"] = 1;
-            inputMapping->printMap();
-            return true;
-        }else if (ke->key() == Qt::Key_Q) {
-            inputMapping->inputMap["right"] = 1;
-            inputMapping->printMap();
-            return true;
-        }else if (ke->key() == Qt::Key_S) {
-            inputMapping->inputMap["down"] = 1;
-            inputMapping->printMap();
-            return true;
-        }else if (ke->key() == Qt::Key_D) {
-            inputMapping->inputMap["left"] = 1;
-            inputMapping->printMap();
-            return true;
-        }else if (ke->key() == Qt::Key_Space) {
-            inputMapping->inputMap["jump"] = 1;
-            inputMapping->printMap();
-            return true;
-        }else if (ke->key() == Qt::Key_E) {
-            inputMapping->inputMap["gravity"] = 1;
-            inputMapping->printMap();
-            return true;
+        if (ke->key() == Qt::Key_Up)
+        {
+            inputMapping->inputMap["cameraZ"] = inputMapping->inputMap["cameraZ"] + 0.05;
         }
+        if (ke->key() == Qt::Key_Down)
+        {
+            inputMapping->inputMap["cameraZ"] = inputMapping->inputMap["cameraZ"] - 0.05;
+        }
+        if (ke->key() == Qt::Key_Left)
+        {
+            inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] + 0.01;
+        }
+        if (ke->key() == Qt::Key_Right)
+        {
+            inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] - 0.01;
+        }
+
+        if (ke->key() == Qt::Key_Plus)
+        {
+            inputMapping->inputMap["cameraZoom"] = inputMapping->inputMap["cameraZoom"] - 0.5;
+        }
+
+        if (ke->key() == Qt::Key_Minus)
+        {
+            inputMapping->inputMap["cameraZoom"] = inputMapping->inputMap["cameraZoom"] + 0.5;
+        }
+        return true;
     } else if (event->type() == QEvent::MouseMove) {
-        QMouseEvent *mouse = static_cast<QMouseEvent *>(event);
+        /*QMouseEvent *mouse = static_cast<QMouseEvent *>(event);
         inputMapping->inputMap["axisHori"] = mouse->x()/(width()*1.0);
         inputMapping->inputMap["axisVerti"] = mouse->y()/(height()*1.0);
         inputMapping->printMap();
-        return true;
+        return true;*/
     }
 
     return QWidget::event(event);
-}
-
-//! [0]
-void MainWidget::mousePressEvent(QMouseEvent *e)
-{
-    // Save mouse press position
-    mousePressPosition = QVector2D(e->localPos());
 }
 
 void MainWidget::DrawMesh(GameObject *gameObject)
@@ -150,64 +140,9 @@ void MainWidget::DrawMesh(GameObject *gameObject)
 
 }
 
-void MainWidget::mouseReleaseEvent(QMouseEvent *e)
-{
-
-    // Mouse release position - mouse press position
-    QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
-
-    // Rotation axis is perpendicular to the mouse position difference
-    // vector
-    QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
-
-    // Accelerate angular speed relative to the length of the mouse sweep
-    qreal acc = diff.length() / 100.0;
-
-    // Calculate new rotation axis as weighted sum
-    rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
-    //rotationAxis = QVector3D(0.0,0.0,1.0).normalized();
-
-    // Increase angular speed
-    angularSpeed += acc;
-}
-//! [0]
-
-//! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
     applicationTime += 0 * timeScale;
-    update();
-}
-//! [1]
-
-void MainWidget::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Up)
-    {
-        cameraZ += 0.05;
-    }
-    if (event->key() == Qt::Key_Down)
-    {
-        cameraZ -= 0.05;
-    }
-    if (event->key() == Qt::Key_Left)
-    {
-        cameraInertie += 0.01;
-    }
-    if (event->key() == Qt::Key_Right)
-    {
-        cameraInertie -= 0.01;
-    }
-
-    if (event->key() == Qt::Key_Plus)
-    {
-        cameraZoom -=0.5;
-    }
-
-    if (event->key() == Qt::Key_Minus)
-    {
-        cameraZoom +=0.5;
-    }
     update();
 }
 
@@ -382,7 +317,7 @@ void MainWidget::paintGL()
     //matrix.translate(0.0, 0, .0);
     //matrix.rotate(rotation);
 
-    posCamera = QVector3D(cameraZoom*sin(applicationTime),cameraZoom*cos(applicationTime),20*sin(cameraZ));
+    posCamera = QVector3D(inputMapping->inputMap["cameraZoom"]*sin(applicationTime),inputMapping->inputMap["cameraZoom"]*cos(applicationTime),20*sin(inputMapping->inputMap["cameraZ"]));
     matrix.lookAt(posCamera, // Eye
                   QVector3D(0,0,0), // Center
                   QVector3D(0,0,1)); // Normal
@@ -406,10 +341,10 @@ void MainWidget::paintGL()
     }
 
 float deltaTime = m_time.elapsed();
-    cameraInertie += inputMapping->inputMap["axisHori"] * (deltaTime/1000.0)*5;
-    cameraInertie *= 0.97;
+    inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] + (inputMapping->inputMap["axisHori"] * (deltaTime/1000.0)*5);
+    inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] * 0.97;
 
-    applicationTime += cameraInertie;
+    applicationTime += inputMapping->inputMap["cameraInertie"];
 
 
     //

@@ -89,11 +89,8 @@ public:
    void DrawMesh(GameObject *gameObject);
    Gravity gravity;
    bool updateInput = true;
-   double mouseX=0.0;
-   double mouseY=0.0;
-   double cameraInertie=0.0;
-   double cameraZ=0;
-   double cameraZoom = 20.0;
+   /*double mouseX=0.0;
+   double mouseY=0.0;*/
 
 
 public slots:
@@ -102,9 +99,6 @@ public slots:
 
 protected:
     bool event(QEvent *event) override;
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void keyPressEvent(QKeyEvent *event) override;
     void timerEvent(QTimerEvent *e) override;
 
     void initializeGL() override;

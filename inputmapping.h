@@ -8,7 +8,7 @@ class InputMapping
 public:
     InputMapping();
     QMap<QString,float> inputMap;
-    QList<QString> list = {"up","down","left","right","jump","gravity","axisHori","axisVerti"};
+    QList<QString> list = {"up","down","left","right","jump","gravity","axisHori","axisVerti","cameraZoom","cameraInertie","cameraZ"};
 
     void printMap();
 };  
