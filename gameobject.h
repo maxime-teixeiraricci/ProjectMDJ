@@ -4,6 +4,7 @@
 #include <collider.h>
 #include <iostream>
 #include "mesh.h"
+#include "transform.h"
 
 class GameObject
 {
@@ -11,7 +12,6 @@ public:
 
     GameObject(Mesh3D *newMesh);
     GameObject(Mesh3D *newMesh, GameObject* parent);
-    GameObject(Mesh3D *newMesh, QVector3D position);
 
     int numberChildren();
     GameObject* getParent();
@@ -26,7 +26,10 @@ public:
     void addChild(GameObject* newChild);
     void Draw(QOpenGLShaderProgram *program, QVector3D parentPosition);
     void Draw(QOpenGLShaderProgram *program);
+    void Draw(QOpenGLShaderProgram *program, Transform *transform);
     void SetPosition(QVector3D newPosition);
+    void SetScale(QVector3D newScale);
+    void SetRotation(QQuaternion newRotation);
 
     int test;
     QVector3D position;
@@ -34,6 +37,7 @@ public:
     QVector4D rotation; // Quaternion <3
     Collider* collider;
     Mesh3D *mesh;
+    Transform *transform;
 
 private:
     GameObject* parent;

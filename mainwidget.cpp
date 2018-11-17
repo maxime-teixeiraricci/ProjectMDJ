@@ -54,6 +54,7 @@
 #include <iostream>
 #include <collider.h>
 
+
 //#include <math.h>
 
 MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
@@ -68,7 +69,7 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     timeFrequence = 1.0/frequence*1000;
     season = seasonStart;
     z = 0;
-    inputMapping = InputMapping();
+    inputMapping = new InputMapping();
     setMouseTracking(true);
     applicationTime = 0;
 
@@ -88,44 +89,44 @@ MainWidget::~MainWidget()
 
 bool MainWidget::event(QEvent *event)
 {
-    QMapIterator<QString, float> i(inputMapping.inputMap);
+    QMapIterator<QString, float> i(inputMapping->inputMap);
     while (i.hasNext()) {
         i.next();
-        inputMapping.inputMap[i.key()] = 0;
+        inputMapping->inputMap[i.key()] = 0;
     }
 
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
         if (ke->key() == Qt::Key_Z) {
-            inputMapping.inputMap["up"] = 1;
-            inputMapping.printMap();
+            inputMapping->inputMap["up"] = 1;
+            inputMapping->printMap();
             return true;
         }else if (ke->key() == Qt::Key_Q) {
-            inputMapping.inputMap["right"] = 1;
-            inputMapping.printMap();
+            inputMapping->inputMap["right"] = 1;
+            inputMapping->printMap();
             return true;
         }else if (ke->key() == Qt::Key_S) {
-            inputMapping.inputMap["down"] = 1;
-            inputMapping.printMap();
+            inputMapping->inputMap["down"] = 1;
+            inputMapping->printMap();
             return true;
         }else if (ke->key() == Qt::Key_D) {
-            inputMapping.inputMap["left"] = 1;
-            inputMapping.printMap();
+            inputMapping->inputMap["left"] = 1;
+            inputMapping->printMap();
             return true;
         }else if (ke->key() == Qt::Key_Space) {
-            inputMapping.inputMap["jump"] = 1;
-            inputMapping.printMap();
+            inputMapping->inputMap["jump"] = 1;
+            inputMapping->printMap();
             return true;
         }else if (ke->key() == Qt::Key_E) {
-            inputMapping.inputMap["gravity"] = 1;
-            inputMapping.printMap();
+            inputMapping->inputMap["gravity"] = 1;
+            inputMapping->printMap();
             return true;
         }
     } else if (event->type() == QEvent::MouseMove) {
         QMouseEvent *mouse = static_cast<QMouseEvent *>(event);
-        inputMapping.inputMap["axisHori"] = mouse->x()/(width()*1.0);
-        inputMapping.inputMap["axisVerti"] = mouse->y()/(height()*1.0);
-        inputMapping.printMap();
+        inputMapping->inputMap["axisHori"] = mouse->x()/(width()*1.0);
+        inputMapping->inputMap["axisVerti"] = mouse->y()/(height()*1.0);
+        inputMapping->printMap();
         return true;
     }
 
@@ -183,11 +184,29 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Up)
     {
-        timeScale += 0.05;
+        cameraZ += 0.05;
     }
-    else if (event->key() == Qt::Key_Down)
+    if (event->key() == Qt::Key_Down)
     {
-        timeScale -= 0.05;
+        cameraZ -= 0.05;
+    }
+    if (event->key() == Qt::Key_Left)
+    {
+        cameraInertie += 0.01;
+    }
+    if (event->key() == Qt::Key_Right)
+    {
+        cameraInertie -= 0.01;
+    }
+
+    if (event->key() == Qt::Key_Plus)
+    {
+        cameraZoom -=0.5;
+    }
+
+    if (event->key() == Qt::Key_Minus)
+    {
+        cameraZoom +=0.5;
     }
     update();
 }
@@ -218,15 +237,11 @@ void MainWidget::initializeGL()
    Mesh3D *m2 = new Mesh3D();
    Mesh3D *m3 = new Mesh3D();
    Mesh3D *m4 = new Mesh3D();
-   m1->Load("../ProjectMDJ/slope.obj");
-   m2->Load("../ProjectMDJ/cube.obj");
+   m1->Load("../ProjectMDJ/block.obj");
+   m2->Load("../ProjectMDJ/block.obj");
    m3->Load("../ProjectMDJ/skybox.obj");
    // Test LOD :
-   m4->Load("../ProjectMDJ/SuzaneLOD0.obj",0);
-   m4->Load("../ProjectMDJ/SuzaneLOD1.obj",1);
-   m4->Load("../ProjectMDJ/SuzaneLOD2.obj",2);
-   m4->Load("../ProjectMDJ/SuzaneLOD3.obj",3);
-   m4->Load("../ProjectMDJ/SuzaneLOD4.obj",4);
+   m4->Load("../ProjectMDJ/block.obj");
    //
 
 
@@ -235,34 +250,54 @@ void MainWidget::initializeGL()
 
    gravity.gravity = QVector3D(0,0,-0.25f);
    GameObject *G1 = new GameObject(m1);
-   GameObject *G2 = new GameObject(m2);
-   GameObject *G3 = new GameObject(m3);
-   GameObject *G4 = new GameObject(m4);
 
-   G1->SetPosition( QVector3D(0,0,0));
-   G2->SetPosition( QVector3D(2.5,0,2.5));
+  G1->transform->SetPosition(QVector3D(5,5,5));
+  m1->LoadTexture("../ProjectMDJ/mud.png");
+  m4->LoadTexture("../ProjectMDJ/grass.png");
+  unsigned int index =0;
 
-   G4->SetPosition( QVector3D(-5,0,0));
+  int col = 9;
+  int lin = 9;
 
-   G2->addChild(G4);
-   gameObjects.push_back(G1);
-   gameObjects.push_back(G2);
+  for (int i = 0 ; i < lin * col ; i ++)
+  {
+      if ((i%lin) == 0 || (i%lin) == lin - 1 || (i/lin) == 0 || (i/lin) == col - 1)
+      {
+      gameObjects.push_back(new GameObject(m1));
+      gameObjects[index]->SetScale(QVector3D(0.5,0.5,0.5));
+      float X = ((i%lin) - (lin/2))*2.0f;
+      float Y = ((i/lin) - (lin/2))*2.0f;
+      gameObjects[index++]->SetPosition(QVector3D(X, Y, -3));
+      }
+  }
+
+  for (int i = 0 ; i < lin * col ; i ++)
+  {
+      gameObjects.push_back(new GameObject(m4));
+      gameObjects[index]->SetScale(QVector3D(0.5,0.5,0.5));
+      float X = ((i%lin) - (lin/2))*2.0f;
+      float Y = ((i/lin) - (lin/2))*2.0f;
+      gameObjects[index++]->SetPosition(QVector3D(X, Y, -1));
+  }
+
+  m2->LoadTexture("../ProjectMDJ/wood.png");
+  gameObjects.push_back(new GameObject(m2));
+  gameObjects[gameObjects.size() - 1]->SetScale(QVector3D((lin/2)+1,(col/2)+1,0.5));
+  gameObjects[gameObjects.size() - 1]->SetPosition(QVector3D(0, 0, -4.5));
+
+    //gameObjects.push_back(G1);
+
+
+   //gameObjects.push_back(G2);
    //gameObjects.push_back(G4);
-   skybox = G3;
+   skybox = new GameObject(m3);
    m_time.start();
-   seasonChange();
 }
 
 void MainWidget::seasonChange()
 {
-   season = (season + 1) % 4;
-   QColor seasonColor = seasonColors[season];
-   for (unsigned int i =0; i < gameObjects.size(); i ++)
-   {
-       gameObjects[i]->mesh->color = seasonColor;
-   }
-
-
+    float deltaTime = m_time.elapsed();
+    std::cout << "FPS : " << 1.0f/ (deltaTime/1000) << std::endl;
 }
 
 //! [3]
@@ -347,11 +382,12 @@ void MainWidget::paintGL()
     //matrix.translate(0.0, 0, .0);
     //matrix.rotate(rotation);
 
-    posCamera = QVector3D(20*sin(applicationTime),20*cos(applicationTime),3);
+    posCamera = QVector3D(cameraZoom*sin(applicationTime),cameraZoom*cos(applicationTime),20*sin(cameraZ));
     matrix.lookAt(posCamera, // Eye
                   QVector3D(0,0,0), // Center
                   QVector3D(0,0,1)); // Normal
 
+    Mesh3D::vectorCamera = (QVector3D(0,0,0) - posCamera).normalized();
     // Set modelview-projection matrixç
     program.setUniformValue("mvp_matrix", projection * matrix);
 //! [6]
@@ -360,42 +396,24 @@ void MainWidget::paintGL()
     program.setUniformValue("texture", 0);
 
     skybox->Draw(&program);
-    for (int i = 0; i < gameObjects.size(); i++)
+
+
+    /*QQuaternion q = gameObjects[0]->transform->GetRotation() + QQuaternion(100,1,0,0);
+    gameObjects[0]->transform->SetRotation(q.normalized());*/
+    for (unsigned int i = 0; i < gameObjects.size(); i++)
     {
         gameObjects[i]->Draw(&program);
     }
-    std::cout << "Application Time : " << applicationTime << std::endl;
-    applicationTime += m_time.elapsed() * 0.00025 * timeScale;
-    if(!gameObjects[1]->collider->IsCollide(gameObjects[0]->collider) && gameObjects[1]->position.z() > -2)
-    {
-        gravity.ApplyGravity(gameObjects[1]);
-    }
-    else
-    {
-        gameObjects[1]->SetPosition(QVector3D(gameObjects[1]->position.x(),0,2.5));
-        gameObjects[1]->SetPosition(gameObjects[1]->position + QVector3D(-0.25,0,0));
-        if (gameObjects[1]->position.x() < -2.5)
-        {
-            gameObjects[1]->SetPosition(QVector3D(2.5,0,2.5));
-        }
-    }
+
+float deltaTime = m_time.elapsed();
+    cameraInertie += inputMapping->inputMap["axisHori"] * (deltaTime/1000.0)*5;
+    cameraInertie *= 0.97;
+
+    applicationTime += cameraInertie;
 
 
-    float distanceRatio = (posCamera - gameObjects[1]->getChild(0)->position).length()/30;
-    gameObjects[1]->getChild(0)->mesh->lodIndex = (int) (distanceRatio / 0.25f);
-
-    if (distanceRatio < 0.1f) gameObjects[1]->getChild(0)->mesh->lodIndex = 0;
-    else if (distanceRatio < 0.25f) gameObjects[1]->getChild(0)->mesh->lodIndex = 1;
-    else if (distanceRatio < 0.5f) gameObjects[1]->getChild(0)->mesh->lodIndex = 2;
-    else if (distanceRatio < 0.75f) gameObjects[1]->getChild(0)->mesh->lodIndex = 3;
-    else  gameObjects[1]->getChild(0)->mesh->lodIndex = 4;
-
-    std::cout << "Season Change !" << std::endl;
-
-
-
-
-
+    //
     m_time.restart();
+
 
 }

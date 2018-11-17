@@ -11,7 +11,7 @@ struct VertexData
     QVector3D normal;
     QVector3D color;
 };
-
+QVector3D Mesh3D::vectorCamera = QVector3D(0,0,0);
 
 Mesh3D::Mesh3D()
 {
@@ -30,6 +30,11 @@ Mesh3D::Mesh3D()
 void Mesh3D::Load(const QString fileName)
 {
     Load(fileName,0);
+}
+
+void Mesh3D::LoadTexture(const QString fileName)
+{
+    texture = new QOpenGLTexture(QImage(fileName).mirrored());
 }
 
 
@@ -147,23 +152,36 @@ void Mesh3D::Rotate(QQuaternion rotation)
     {
         QGenericMatrix<1,3, float> m1;
         m1(0, 0) = mesh->verticePosition[i].x();
-        m1(0, 1) = mesh->verticePosition[i].y();
-        m1(0, 2) = mesh->verticePosition[i].z();
-
+        m1(1, 0) = mesh->verticePosition[i].y();
+        m1(2,0) = mesh->verticePosition[i].z();
+        /*QGenericMatrix<1,3, float> matrixNormal;
+        matrixNormal(0, 0) = mesh->normals[i].x();
+        matrixNormal(1, 0) = mesh->normals[i].y();
+        matrixNormal(2,0) = mesh->normals[i].z();*/
         QGenericMatrix<3,3, float> m2(rotation.toRotationMatrix());
 
 
 
-        QGenericMatrix<1,3,float> result = m2 * m1;
+        QGenericMatrix<1,3,float> result = m2*m1;
+        mesh->verticePosition[i] = QVector3D(result.data()[0],result.data()[1],result.data()[2] );
 
-        //verticePosition[i] = ;
+        //QGenericMatrix<1,3,float> result2 = m2*matrixNormal;
+
+        //mesh->normals[i] = QVector3D(result2.data()[0],result2.data()[1],result2.data()[2] );
     }
-    sphereBoundDistance = 0;
-    for (unsigned int i = 0; i < mesh->verticePosition.size(); i ++)
+
+    for (unsigned int i = 0; i < mesh->normals.size(); i ++)
     {
-        double d = (center- mesh->verticePosition[i]).length();
-        if (d > sphereBoundDistance) sphereBoundDistance = d;
+        QGenericMatrix<3,3, float> m2(rotation.toRotationMatrix());
+        QGenericMatrix<1,3, float> matrixNormal;
+        matrixNormal(0, 0) = mesh->normals[i].x();
+        matrixNormal(1, 0) = mesh->normals[i].y();
+        matrixNormal(2,0) = mesh->normals[i].z();
+        QGenericMatrix<1,3,float> result2 = m2*matrixNormal;
+        mesh->normals[i] = QVector3D(result2.data()[0],result2.data()[1],result2.data()[2] );
     }
+
+
 }
 
 void Mesh3D::Scale(double scale)
@@ -277,3 +295,85 @@ void Mesh3D::KDopCompute()
     }
 
 }
+
+QVector3D Mesh3D::normalTriangle(QVector3D verticeA, QVector3D verticeB,QVector3D verticeC)
+{
+    return (verticeA + verticeB + verticeC) / 3.0f;
+}
+
+void Mesh3D::Draw(QOpenGLShaderProgram *program, Transform *transform)
+{
+    MeshIdentity *mesh = meshesLOD[lodIndex];
+    int j =0;
+    std::vector<VertexData> outVertexData;
+    std::vector<GLushort> outIndexData;
+    QVector3D vectCam = Mesh3D::vectorCamera;
+    vectCam.normalize();
+    for( unsigned int i=0; i < mesh->trianglesIndex.size(); i++ )
+    {
+        unsigned int k = i /3;
+        float nA = QVector3D::dotProduct(vectCam,mesh->normals[mesh->normalsIndex[k]].normalized());
+        float nB = QVector3D::dotProduct(vectCam,mesh->normals[mesh->normalsIndex[k+1]].normalized());
+        float nC = QVector3D::dotProduct(vectCam,mesh->normals[mesh->normalsIndex[k+2]].normalized());
+        if (nA >=-1 || nB >=-1 || nC >=-1)
+        {
+        int I = mesh->trianglesIndex[i];
+        int J = mesh->texturesIndex[i];
+        int K = mesh->normalsIndex[i];
+       QVector3D vertex = transform->transformMatrix *mesh->verticePosition[ I ];
+       QVector2D texture = mesh->texturePosition[ J ];
+       QVector3D normal = mesh->normals[K];
+       QVector3D colorTexture = QVector3D(color.red() /255.0f, color.green()/255.0f, color.blue()/255.0f);
+       outVertexData.push_back( {vertex, texture,normal,colorTexture});
+       outIndexData.push_back(i);
+        }
+        else
+        {
+            i+=2;
+        }
+
+
+    }
+    QOpenGLBuffer arrayBuf;
+    QOpenGLBuffer indexBuf(QOpenGLBuffer::IndexBuffer);
+    initializeOpenGLFunctions();
+    arrayBuf.create();
+    indexBuf.create();
+
+    arrayBuf.bind();
+    arrayBuf.allocate(outVertexData.data(), outVertexData.size() * sizeof(VertexData));
+
+    // Transfer index data to VBO 1
+    indexBuf.bind();
+    indexBuf.allocate(outIndexData.data(), outIndexData.size() * sizeof(GLushort));
+
+    quintptr offset = 0;
+    //program->setAttributeValue(program->attributeLocation("snow"), snow);
+    int vertexLocation = program->attributeLocation("a_position");
+    program->enableAttributeArray(vertexLocation);
+    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+    offset += sizeof(QVector3D);
+
+    int texcoordLocation = program->attributeLocation("a_texcoord");
+    program->enableAttributeArray(texcoordLocation);
+    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+    offset += sizeof(QVector2D);
+
+    int normalLocation = program->attributeLocation("a_normal");
+    program->enableAttributeArray(normalLocation);
+    program->setAttributeBuffer(normalLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+    //meshes[m].texture->bind();
+
+    offset += sizeof(QVector3D);
+
+    int colorLocation = program->attributeLocation("a_color");
+    program->enableAttributeArray(colorLocation);
+    program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+    texture->bind();
+
+    glDrawElements(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr);
+}
+
+

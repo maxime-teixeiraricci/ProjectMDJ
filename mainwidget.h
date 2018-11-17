@@ -69,6 +69,8 @@
 #include "timer_manager.h"
 #include "gravity.h"
 #include "inputmapping.h"
+#include "transform.h"
+
 class GeometryEngine;
 
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -86,6 +88,12 @@ public:
    int m_frameCount;
    void DrawMesh(GameObject *gameObject);
    Gravity gravity;
+   bool updateInput = true;
+   double mouseX=0.0;
+   double mouseY=0.0;
+   double cameraInertie=0.0;
+   double cameraZ=0;
+   double cameraZoom = 20.0;
 
 
 public slots:
@@ -105,6 +113,8 @@ protected:
 
     void initShaders();
     void initTextures();
+    Transform* transformTest;
+    InputMapping* inputMapping;
 
 private:
     QBasicTimer  timer;
@@ -132,7 +142,7 @@ private:
     double timeScale;
     double applicationTime;
     double timeFrequence;
-    InputMapping inputMapping;
+
 };
 
 #endif // MAINWIDGET_H

@@ -8,6 +8,7 @@ GameObject::GameObject(Mesh3D *newMesh)
     this->scale = QVector3D(1,1,1);
     this->rotation = QVector4D(0,0,0,1);
     collider = new Collider(newMesh);
+    transform = new Transform();
 }
 
 GameObject::GameObject(Mesh3D *newMesh, GameObject* parent)
@@ -18,17 +19,9 @@ GameObject::GameObject(Mesh3D *newMesh, GameObject* parent)
     rotation = QVector4D(0,0,0,1);
     setParent(parent);
     collider = new Collider(newMesh);
+    transform = new Transform();
 }
 
-GameObject::GameObject(Mesh3D *newMesh, QVector3D position)
-{
-    mesh = newMesh;
-    this->position = position;
-    this->scale = QVector3D(1,1,1);
-    this->rotation = QVector4D(0,0,0,1);
-    this->setParent(parent);
-    collider = new Collider(newMesh);
-}
 
 
 GameObject* GameObject::getParent()
@@ -83,15 +76,27 @@ void GameObject::Draw(QOpenGLShaderProgram *program, QVector3D parentPosition)
 
 void GameObject::Draw(QOpenGLShaderProgram *program)
 {
-    Draw(program, QVector3D(0,0,0));
+    Draw(program, transform);
+}
+
+void GameObject::Draw(QOpenGLShaderProgram *program, Transform *transform)
+{
+    mesh->Draw(program, transform);
 }
 
 void GameObject::SetPosition(QVector3D newPosition)
 {
+    transform->SetPosition(newPosition);
+}
 
-    mesh->Translate(newPosition - position);
-    position = newPosition;
-    mesh->origin = newPosition;
+void GameObject::SetScale(QVector3D newScale)
+{
+    transform->SetScale(newScale);
+}
+
+void GameObject::SetRotation(QQuaternion newRotation)
+{
+    transform->SetRotation(newRotation);
 }
 
 QVector3D GameObject::GetPosition()

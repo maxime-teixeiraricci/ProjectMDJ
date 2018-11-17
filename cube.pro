@@ -5,13 +5,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     mesh.cpp \
-    obj_loader.cpp \
     gameobject.cpp \
     collider.cpp \
     timer_manager.cpp \
     gravity.cpp \
     inputmapping.cpp \
-    camera.cpp
+    camera.cpp \
+    transform.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -26,7 +26,8 @@ HEADERS += \
     timer_manager.h \
     gravity.h \
     inputmapping.h \
-    camera.h
+    camera.h \
+    transform.h
 
 RESOURCES += \
     shaders.qrc \
