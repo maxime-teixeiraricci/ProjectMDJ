@@ -118,13 +118,22 @@ void Mesh3D::Load(const QString fileName, int LODIndex)
             lod->normalsIndex.push_back(normalIndex[2]-1);
         }
     }
-    printf("Mesh : %s\n", fileName);
+
     center/=lod->verticePosition.size();
     sphereBoundDistance = 0;
     for (int i = 0; i <lod-> verticePosition.size(); i ++)
     {
         double d = (center - lod->verticePosition[i]).length();
         if (d > sphereBoundDistance) sphereBoundDistance = d;
+    }
+    for( unsigned int i=0; i < lod->trianglesIndex.size(); i+=3 )
+    {
+        unsigned int k = i/3;
+        QVector3D A = lod->normals[lod->normalsIndex[lod->trianglesIndex[3*k]]];
+        QVector3D B = lod->normals[lod->normalsIndex[lod->trianglesIndex[3*k+1]]];
+        QVector3D C = lod->normals[lod->normalsIndex[lod->trianglesIndex[3*k+2]]];
+        lod->normalsTriangles.push_back(normalTriangle(A,B,C));
+
     }
 
     meshesLOD.push_back(lod);
@@ -298,7 +307,7 @@ void Mesh3D::KDopCompute()
 
 QVector3D Mesh3D::normalTriangle(QVector3D verticeA, QVector3D verticeB,QVector3D verticeC)
 {
-    return (verticeA + verticeB + verticeC) / 3.0f;
+    return ((verticeA + verticeB + verticeC) / 3.0f).normalized();
 }
 
 void Mesh3D::Draw(QOpenGLShaderProgram *program, Transform *transform)
@@ -308,28 +317,26 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program, Transform *transform)
     std::vector<VertexData> outVertexData;
     std::vector<GLushort> outIndexData;
     QVector3D vectCam = Mesh3D::vectorCamera;
+    //QVector3D vectCam(1,-1,-1);
     vectCam.normalize();
-    for( unsigned int i=0; i < mesh->trianglesIndex.size(); i++ )
+    int index = 0;
+    for( unsigned int i=0; i < mesh->trianglesIndex.size(); i+=3 )
     {
-        unsigned int k = i /3;
-        float nA = QVector3D::dotProduct(vectCam,mesh->normals[mesh->normalsIndex[k]].normalized());
-        float nB = QVector3D::dotProduct(vectCam,mesh->normals[mesh->normalsIndex[k+1]].normalized());
-        float nC = QVector3D::dotProduct(vectCam,mesh->normals[mesh->normalsIndex[k+2]].normalized());
-        if (nA >=-1 || nB >=-1 || nC >=-1)
+
+        if ( QVector3D::dotProduct(-vectCam, mesh->normals[mesh->normalsIndex[i]].normalized())> -0.5)
         {
-        int I = mesh->trianglesIndex[i];
-        int J = mesh->texturesIndex[i];
-        int K = mesh->normalsIndex[i];
-       QVector3D vertex = transform->transformMatrix *mesh->verticePosition[ I ];
-       QVector2D texture = mesh->texturePosition[ J ];
-       QVector3D normal = mesh->normals[K];
-       QVector3D colorTexture = QVector3D(color.red() /255.0f, color.green()/255.0f, color.blue()/255.0f);
-       outVertexData.push_back( {vertex, texture,normal,colorTexture});
-       outIndexData.push_back(i);
-        }
-        else
-        {
-            i+=2;
+            for(int m = 0; m < 3 ; m ++)
+            {
+                int I = mesh->trianglesIndex[i+m];
+                int J = mesh->texturesIndex[i+m];
+                int K = mesh->normalsIndex[i+m];
+               QVector3D vertex = transform->transformMatrix *mesh->verticePosition[ I ];
+               QVector2D texture = mesh->texturePosition[ J ];
+               QVector3D normal = mesh->normals[K];
+               QVector3D colorTexture = QVector3D(color.red() /255.0f, color.green()/255.0f, color.blue()/255.0f);
+               outVertexData.push_back( {vertex, texture,normal,colorTexture});
+               outIndexData.push_back(index++);
+            }
         }
 
 

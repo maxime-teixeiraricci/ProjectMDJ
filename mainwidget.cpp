@@ -237,7 +237,7 @@ void MainWidget::initializeGL()
    Mesh3D *m2 = new Mesh3D();
    Mesh3D *m3 = new Mesh3D();
    Mesh3D *m4 = new Mesh3D();
-   m1->Load("../ProjectMDJ/block.obj");
+   m1->Load("../ProjectMDJ/cube.obj");
    m2->Load("../ProjectMDJ/block.obj");
    m3->Load("../ProjectMDJ/skybox.obj");
    // Test LOD :
@@ -251,7 +251,7 @@ void MainWidget::initializeGL()
    gravity.gravity = QVector3D(0,0,-0.25f);
    GameObject *G1 = new GameObject(m1);
 
-  G1->transform->SetPosition(QVector3D(5,5,5));
+  G1->transform->SetScale(QVector3D(5,5,5));
   m1->LoadTexture("../ProjectMDJ/mud.png");
   m4->LoadTexture("../ProjectMDJ/grass.png");
   unsigned int index =0;
@@ -285,7 +285,7 @@ void MainWidget::initializeGL()
   gameObjects[gameObjects.size() - 1]->SetScale(QVector3D((lin/2)+1,(col/2)+1,0.5));
   gameObjects[gameObjects.size() - 1]->SetPosition(QVector3D(0, 0, -4.5));
 
-    //gameObjects.push_back(G1);
+   // gameObjects.push_back(G1);
 
 
    //gameObjects.push_back(G2);
