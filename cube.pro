@@ -11,7 +11,9 @@ SOURCES += main.cpp \
     gravity.cpp \
     inputmapping.cpp \
     camera.cpp \
-    transform.cpp
+    transform.cpp \
+    component.cpp \
+    playercomponent.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -27,7 +29,9 @@ HEADERS += \
     gravity.h \
     inputmapping.h \
     camera.h \
-    transform.h
+    transform.h \
+    component.h \
+    playercomponent.h
 
 RESOURCES += \
     shaders.qrc \

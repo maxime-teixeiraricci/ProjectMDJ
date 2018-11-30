@@ -5,6 +5,7 @@
 #include <iostream>
 #include "mesh.h"
 #include "transform.h"
+#include "component.h"
 
 class GameObject
 {
@@ -38,6 +39,7 @@ public:
     Collider* collider;
     Mesh3D *mesh;
     Transform *transform;
+    std::vector<Component *> components;
 
 private:
     GameObject* parent;

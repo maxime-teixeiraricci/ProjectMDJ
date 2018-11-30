@@ -53,8 +53,9 @@
 #include <QMouseEvent>
 #include <iostream>
 #include <collider.h>
+#include "playercomponent.h"
 
-
+double MainWidget::deltaTime = 0;
 //#include <math.h>
 
 MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
@@ -72,6 +73,7 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     inputMapping = new InputMapping();
     setMouseTracking(true);
     applicationTime = 0;
+    MainWidget::deltaTime = 0;
 
 
 }
@@ -205,6 +207,11 @@ void MainWidget::initializeGL()
       gameObjects[index++]->SetPosition(QVector3D(X, Y, -3));
       }
   }
+  PlayerComponent *pc = new PlayerComponent();
+  gameObjects.push_back(new GameObject(m4));
+  gameObjects[index]->SetScale(QVector3D(0.5,0.5,0.5));
+  gameObjects[index]->components.push_back(pc);
+  gameObjects[index++]->SetPosition(QVector3D(0, 0, 15));
 
   for (int i = 0 ; i < lin * col ; i ++)
   {
@@ -227,6 +234,7 @@ void MainWidget::initializeGL()
    //gameObjects.push_back(G4);
    skybox = new GameObject(m3);
    m_time.start();
+
 }
 
 void MainWidget::seasonChange()
@@ -307,8 +315,12 @@ void MainWidget::resizeGL(int w, int h)
 void MainWidget::paintGL()
 {
     // Clear color and depth buffer
+   // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    int MatSpec [4] = {1,1,1,1};
+    //glMaterialiv(GL_FRONT_AND_BACK,GL_SPECULAR,MatSpec);
+    //glMateriali(GL_FRONT_AND_BACK,GL_SHININESS,100);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    //glMatrixMode(GL_MODELVIEW);
     texture->bind();
 
 //! [6]
@@ -337,10 +349,17 @@ void MainWidget::paintGL()
     gameObjects[0]->transform->SetRotation(q.normalized());*/
     for (unsigned int i = 0; i < gameObjects.size(); i++)
     {
-        gameObjects[i]->Draw(&program);
+        std::cout << gameObjects[i]->components.size() << std::endl;
+        for (unsigned int j = 0; j < gameObjects[i]->components.size(); j++)
+        {
+            double dT = MainWidget::deltaTime;
+            gameObjects[i]->transform->SetPosition(QVector3D(0,0,-0.1));// * m_time.elapsed();
+            gameObjects[i]->Draw(&program);
+        }
+
     }
 
-float deltaTime = m_time.elapsed();
+    MainWidget::deltaTime = m_time.elapsed();
     inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] + (inputMapping->inputMap["axisHori"] * (deltaTime/1000.0)*5);
     inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] * 0.97;
 

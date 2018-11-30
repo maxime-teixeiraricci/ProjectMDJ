@@ -78,6 +78,7 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
+    static double deltaTime;
     explicit MainWidget(double value, int seasonStart, QWidget *parent = 0);
     ~MainWidget();
     int z = 0;

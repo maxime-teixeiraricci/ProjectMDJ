@@ -1,6 +1,7 @@
 #include "gameobject.h"
 #include <collider.h>
 
+
 GameObject::GameObject(Mesh3D *newMesh)
 {
     mesh = newMesh;

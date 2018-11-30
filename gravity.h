@@ -1,7 +1,7 @@
 #ifndef GRAVITY_H
 #define GRAVITY_H
 #include "QVector3D"
-#include "gameobject.h";
+#include "gameobject.h"
 
 class Gravity
 {
