@@ -24,6 +24,7 @@ public:
     QVector3D scale;
     QQuaternion rotation;
 
+    void getMatrix();
     void Rotate();
     void Translate();
     void Scale();

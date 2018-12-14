@@ -88,6 +88,7 @@ public:
    QTime m_time;
    int m_frameCount;
    void DrawMesh(GameObject *gameObject);
+   GameObject *playerObject;
    Gravity gravity;
    bool updateInput = true;
    /*double mouseX=0.0;

@@ -32,6 +32,14 @@ void Transform::Scale()
     transformMatrix.scale(scale);
 }
 
+void Transform::getMatrix()
+{
+    transformMatrix =  QMatrix4x4();
+    Rotate();
+    Translate();
+    Scale();
+}
+
 void Transform::SetPosition(QVector3D vector)
 {
     position = vector;

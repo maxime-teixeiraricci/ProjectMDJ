@@ -5,8 +5,9 @@
 #include <QOpenGLTexture>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions>
-
+#include <QOpenGLExtraFunctions>
 #include <QOpenGLBuffer>
+#include <QOpenGLFunctions>
 #include "transform.h"
 //#include <collider.h>
 

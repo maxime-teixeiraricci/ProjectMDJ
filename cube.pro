@@ -1,7 +1,8 @@
-QT       += core gui widgets
+QT       += core gui widgets opengl
 
 TARGET = cube
 TEMPLATE = app
+
 
 SOURCES += main.cpp \
     mesh.cpp \

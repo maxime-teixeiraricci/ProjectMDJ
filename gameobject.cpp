@@ -51,6 +51,8 @@ void GameObject::setParent(GameObject* newParent)
 }
 
 
+
+
 int GameObject::numberChildren()
 {
     return children.size();
