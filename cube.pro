@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     camera.cpp \
     transform.cpp \
     component.cpp \
-    playercomponent.cpp
+    playercomponent.cpp \
+    mapmaker.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -32,7 +33,8 @@ HEADERS += \
     camera.h \
     transform.h \
     component.h \
-    playercomponent.h
+    playercomponent.h \
+    mapmaker.h
 
 RESOURCES += \
     shaders.qrc \

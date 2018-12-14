@@ -54,6 +54,7 @@
 #include <iostream>
 #include <collider.h>
 #include "playercomponent.h"
+#include "mapmaker.h"
 
 double MainWidget::deltaTime = 0;
 //#include <math.h>
@@ -130,19 +131,19 @@ bool MainWidget::event(QEvent *event)
 
         if (ke->key() == Qt::Key_Up)
         {
-            inputMapping->inputMap["cameraZ"] = inputMapping->inputMap["cameraZ"] + 0.05;
+            inputMapping->inputMap["cameraZ"] = 1;
         }
         if (ke->key() == Qt::Key_Down)
         {
-            inputMapping->inputMap["cameraZ"] = inputMapping->inputMap["cameraZ"] - 0.05;
+            inputMapping->inputMap["cameraZ"] = -1;
         }
         if (ke->key() == Qt::Key_Left)
         {
-            inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] + 0.01;
+            inputMapping->inputMap["cameraHorizontal"] = 1;
         }
         if (ke->key() == Qt::Key_Right)
         {
-            inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] - 0.01;
+            inputMapping->inputMap["cameraHorizontal"] = -1;
         }
 
         if (ke->key() == Qt::Key_Plus)
@@ -199,9 +200,8 @@ void MainWidget::initializeGL()
     glEnable( GL_FRONT);
 //! [2]
 
-   geometries1 = new GeometryEngine;
-   geometries2 = new GeometryEngine;
 
+/*
     // Use QBasicTimer because its faster than QTimer
    timer.start(timeFrequence, this);
    Mesh3D *m1 = new Mesh3D();
@@ -238,25 +238,18 @@ void MainWidget::initializeGL()
       if ((i%lin) == 0 || (i%lin) == lin - 1 || (i/lin) == 0 || (i/lin) == col - 1)
       {
       gameObjects.push_back(new GameObject(m1));
-      gameObjects[index]->SetScale(QVector3D(0.5,0.5,0.5));
+      //gameObjects[index]->SetScale(QVector3D(0.5,0.5,0.5));
       float X = ((i%lin) - (lin/2))*2.0f;
       float Y = ((i/lin) - (lin/2))*2.0f;
       gameObjects[index++]->SetPosition(QVector3D(X, Y, -3));
       }
   }
-  PlayerComponent *pc = new PlayerComponent();
-  pc->input = inputMapping;
 
-  playerObject = new GameObject(m5);
-  pc->gameObject = playerObject;
-  playerObject->SetScale(QVector3D(0.5,0.5,0.5));
-  playerObject->components.push_back(pc);
-  playerObject->SetPosition(QVector3D(0, 0, 3));
 
   for (int i = 0 ; i < lin * col ; i ++)
   {
       gameObjects.push_back(new GameObject(m4));
-      gameObjects[index]->SetScale(QVector3D(0.5,0.5,0.5));
+      //gameObjects[index]->SetScale(QVector3D(0.5,0.5,0.5));
       float X = ((i%lin) - (lin/2))*2.0f;
       float Y = ((i/lin) - (lin/2))*2.0f;
       gameObjects[index++]->SetPosition(QVector3D(X, Y, -1));
@@ -271,7 +264,24 @@ void MainWidget::initializeGL()
 
 
    //gameObjects.push_back(G2);
-   //gameObjects.push_back(G4);
+   //gameObjects.push_back(G4);*/
+    PlayerComponent *pc = new PlayerComponent();
+    pc->input = inputMapping;
+    Mesh3D *m5 = new Mesh3D();
+    m5->Load("../ProjectMDJ/block.obj");
+    m5->LoadTexture("../ProjectMDJ/PlayerTexture.png");
+    playerObject = new GameObject(m5);
+    pc->gameObject = playerObject;
+    playerObject->SetScale(QVector3D(0.5,0.5,0.5));
+    playerObject->components.push_back(pc);
+    playerObject->SetPosition(QVector3D(0, 0, 3));
+   MapMaker mapMaker;
+   //gameObjects =
+   mapMaker.CreateLevel("../ProjectMDJ/level02.txt", &gameObjects);
+
+   Mesh3D *m3 = new Mesh3D();
+   m3->Load("../ProjectMDJ/skybox.obj");
+   m3->texture = new QOpenGLTexture(QImage(":/Daylight Box UV.png").mirrored());
    skybox = new GameObject(m3);
    m_time.start();
 
@@ -280,7 +290,6 @@ void MainWidget::initializeGL()
 void MainWidget::seasonChange()
 {
     float deltaTime = m_time.elapsed();
-    std::cout << "FPS : " << 1.0f/ (deltaTime/1000) << std::endl;
 }
 
 //! [3]
@@ -365,6 +374,7 @@ void MainWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glMatrixMode(GL_MODELVIEW);
     texture->bind();
+    MainWidget::deltaTime = m_time.elapsed() / 1000.0f;
 
 //! [6]
     // Calculate model view transformation
@@ -372,7 +382,8 @@ void MainWidget::paintGL()
     //matrix.translate(0.0, 0, .0);
     //matrix.rotate(rotation);
 
-    posCamera = QVector3D(20*sin(applicationTime),20*cos(applicationTime),3);
+    applicationTime += inputMapping->inputMap["cameraHorizontal"] * MainWidget::deltaTime;
+    posCamera = QVector3D(35*sin(applicationTime),35*cos(applicationTime),15);
     matrix.lookAt(posCamera, // Eye
                   QVector3D(0,0,0), // Center
                   QVector3D(0,0,1)); // Normal
@@ -393,16 +404,16 @@ void MainWidget::paintGL()
     playerObject->components[0]->Do();
     //std::cout <<"Size: " << playerObject->components.size() << std::endl;
     playerObject->Draw(&program);
-    double dT = MainWidget::deltaTime;
+
     for (unsigned int i = 0; i < gameObjects.size(); i++)
     {
-        //std::cout << gameObjects.size() << std::endl;
+        std::cout <<i<<"/"<< gameObjects.size() << std::endl;
         gameObjects[i]->Draw(&program);
     }
 
-    MainWidget::deltaTime = m_time.elapsed();
-    //inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] + (inputMapping->inputMap["axisHori"] * (deltaTime/1000.0)*5);
-    //inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] * 0.97;
+
+    inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] + (inputMapping->inputMap["axisHori"] * (deltaTime/1000.0)*5);
+    inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] * 0.97;
 
     //applicationTime += inputMapping->inputMap["cameraInertie"];
 

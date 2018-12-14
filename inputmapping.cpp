@@ -24,6 +24,6 @@ void InputMapping::printMap()
     QMapIterator<QString, float> i(inputMap);
     while (i.hasNext()) {
         i.next();
-        std::cout << i.key().toLatin1().constData() << ":" << i.value() << std::endl;
+        //std::cout << i.key().toLatin1().constData() << ":" << i.value() << std::endl;
     }
 }
