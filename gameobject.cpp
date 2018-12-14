@@ -68,14 +68,6 @@ void GameObject::addChild(GameObject* newChild)
     children.push_back(newChild);
 }
 
-void GameObject::Draw(QOpenGLShaderProgram *program, QVector3D parentPosition)
-{
-    mesh->Draw(program, position +parentPosition);
-    for (unsigned int child = 0 ; child < children.size(); child ++)
-    {
-       getChild(child)->Draw(program, position + parentPosition);
-    }
-}
 
 void GameObject::Draw(QOpenGLShaderProgram *program)
 {

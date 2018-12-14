@@ -26,6 +26,14 @@ struct MeshIdentity
     std::vector<int> normalsIndex;
 };
 
+struct VertexData
+{
+    QVector3D position;
+    QVector2D texCoord;
+    QVector3D normal;
+    QVector3D color;
+};
+
 class Mesh3D : protected QOpenGLFunctions
 {
 public:
@@ -35,8 +43,10 @@ public:
     void Scale(double scale);
     void Rotate(QQuaternion rotate);
     void Load(const QString fileName);
+    void StaticLoad(const QString fileName);
     void Load(const QString fileName, int lodIndex);
     void LoadTexture(const QString fileName);
+    void Compute(Transform *transform);
 
     QOpenGLTexture *texture;
 
@@ -51,7 +61,7 @@ public:
     std::vector<float> kdopMin;
     QVector3D center;
     double sphereBoundDistance;
-    void Draw(QOpenGLShaderProgram *program, QVector3D relativePosition);
+    //void Draw(QOpenGLShaderProgram *program, QVector3D relativePosition);
     void Draw(QOpenGLShaderProgram *program, Transform *transform);
     QVector3D normalTriangle(QVector3D verticeA, QVector3D verticeB,QVector3D verticeC);
 
@@ -60,6 +70,9 @@ public:
     int test;
 
     QColor color;
+
+    std::vector<VertexData> outVertexData;
+    std::vector<GLushort> outIndexData;
 
 
 };

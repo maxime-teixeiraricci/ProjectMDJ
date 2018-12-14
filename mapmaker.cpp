@@ -45,18 +45,15 @@ void  MapMaker::CreateLevel(QString mapfile,std::vector<GameObject*> *resList)
         {
             Z --;
             j = 0;
-            std::cout <<"Z : "<< Z << std::endl;
         }
         else
         {
-            std::cout <<"J : "<< j << std::endl;
             for (unsigned int i = 0; i < X; i++)
             {
                 char c = lineHeader[i];
 
                 if ((int) c == 13)
                 {
-                    std::cout <<"OK"<< std::endl;
                     break;
                 }
                 if (c != 'O')
@@ -83,10 +80,11 @@ void  MapMaker::CreateLevel(QString mapfile,std::vector<GameObject*> *resList)
                         break;
                     }
                     resList->push_back(new GameObject(m));
-                    std::cout << c <<" " << (int)c << " - "<<resList->size() << std::endl;
+
                     float x = i;//-(X/2) + i;
                     float y = j;//-(Y/2) + j;
                     resList->at(resList->size() - 1)->transform->position = QVector3D(x*2, y*2, Z*2);
+                    m->Compute(resList->at(resList->size() - 1)->transform);
                 }
 
 
@@ -97,6 +95,5 @@ void  MapMaker::CreateLevel(QString mapfile,std::vector<GameObject*> *resList)
         }
 
     }
-    std::cout << "Taille liste : " << resList->size() << std::endl;
 
 }

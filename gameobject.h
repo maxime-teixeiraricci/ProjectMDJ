@@ -25,7 +25,6 @@ public:
     void setMesh(Mesh3D* newMesh);
 
     void addChild(GameObject* newChild);
-    void Draw(QOpenGLShaderProgram *program, QVector3D parentPosition);
     void Draw(QOpenGLShaderProgram *program);
     void Draw(QOpenGLShaderProgram *program, Transform *transform);
     void SetPosition(QVector3D newPosition);

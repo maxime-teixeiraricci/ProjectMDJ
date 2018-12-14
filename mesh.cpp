@@ -5,13 +5,7 @@
 #include <QGenericMatrix>
 
 
-struct VertexData
-{
-    QVector3D position;
-    QVector2D texCoord;
-    QVector3D normal;
-    QVector3D color;
-};
+
 QVector3D Mesh3D::vectorCamera = QVector3D(0,0,0);
 
 Mesh3D::Mesh3D()
@@ -212,6 +206,7 @@ void Mesh3D::Scale(double scale)
     }
 }
 
+/*
 void Mesh3D::Draw(QOpenGLShaderProgram *program, QVector3D relativePosition)
 {
     MeshIdentity *mesh = meshesLOD[lodIndex];
@@ -274,6 +269,12 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program, QVector3D relativePosition)
 
     glDrawElements(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr);
 }
+*/
+
+void Mesh3D::StaticLoad(const QString fileName)
+{
+    Load(fileName,0);
+}
 
 void Mesh3D::KDopCompute()
 {
@@ -311,12 +312,12 @@ QVector3D Mesh3D::normalTriangle(QVector3D verticeA, QVector3D verticeB,QVector3
     return ((verticeA + verticeB + verticeC) / 3.0f).normalized();
 }
 
-void Mesh3D::Draw(QOpenGLShaderProgram *program, Transform *transform)
+
+void Mesh3D::Compute(Transform *transform)
 {
     MeshIdentity *mesh = meshesLOD[lodIndex];
     int j =0;
-    std::vector<VertexData> outVertexData;
-    std::vector<GLushort> outIndexData;
+
     QVector3D vectCam = Mesh3D::vectorCamera;
     //QVector3D vectCam(1,-1,-1);
     vectCam.normalize();
@@ -343,6 +344,11 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program, Transform *transform)
 
 
     }
+
+}
+
+void Mesh3D::Draw(QOpenGLShaderProgram *program, Transform *transform)
+{
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf(QOpenGLBuffer::IndexBuffer);
     initializeOpenGLFunctions();
@@ -384,5 +390,7 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program, Transform *transform)
     //glDrawElementsInstanced()
     glDrawElements(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr);
 }
+
+
 
 

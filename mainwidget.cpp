@@ -283,6 +283,7 @@ void MainWidget::initializeGL()
    m3->Load("../ProjectMDJ/skybox.obj");
    m3->texture = new QOpenGLTexture(QImage(":/Daylight Box UV.png").mirrored());
    skybox = new GameObject(m3);
+   m3->Compute(skybox->transform);
    m_time.start();
 
 }
@@ -354,7 +355,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 100.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 150.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -366,6 +367,7 @@ void MainWidget::resizeGL(int w, int h)
 
 void MainWidget::paintGL()
 {
+    //inputMapping->reset();
     // Clear color and depth buffer
    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     int MatSpec [4] = {1,1,1,1};
@@ -407,7 +409,6 @@ void MainWidget::paintGL()
 
     for (unsigned int i = 0; i < gameObjects.size(); i++)
     {
-        std::cout <<i<<"/"<< gameObjects.size() << std::endl;
         gameObjects[i]->Draw(&program);
     }
 

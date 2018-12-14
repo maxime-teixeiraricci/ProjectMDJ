@@ -59,13 +59,7 @@ using namespace std;
 #include <QImage>
 #include <collider.h>
 
-struct VertexData
-{
-    QVector3D position;
-    QVector2D texCoord;
-    QVector3D normal;
-    QVector3D color;
-};
+
 
 //! [0]
 GeometryEngine::GeometryEngine()
