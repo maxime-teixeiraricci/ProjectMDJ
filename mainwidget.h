@@ -67,9 +67,9 @@
 #include "gameobject.h"
 #include "QTime"
 #include "timer_manager.h"
-#include "gravity.h"
 #include "inputmapping.h"
 #include "transform.h"
+#include "gravitycomponent.h"
 
 class GeometryEngine;
 
@@ -89,11 +89,6 @@ public:
    int m_frameCount;
    void DrawMesh(GameObject *gameObject);
    GameObject *playerObject;
-   Gravity gravity;
-   bool updateInput = true;
-   /*double mouseX=0.0;
-   double mouseY=0.0;*/
-
 
 public slots:
      void seasonChange();
@@ -110,14 +105,10 @@ protected:
     void initShaders();
     void initTextures();
     Transform* transformTest;
-    InputMapping* inputMapping;
 
 private:
     QBasicTimer  timer;
     QOpenGLShaderProgram program;
-    GeometryEngine *geometries1;
-    GeometryEngine *geometries2;
-
     QOpenGLTexture *texture;
 
     QMatrix4x4 projection;
@@ -125,6 +116,9 @@ private:
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
     QVector3D posCamera;
+    QVector3D targetCamera;
+
+
     qreal angularSpeed;
     QQuaternion rotation;
 

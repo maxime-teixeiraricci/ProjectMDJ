@@ -8,7 +8,6 @@ GameObject::GameObject(Mesh3D *newMesh)
     this->position = QVector3D(0,0,0);
     this->scale = QVector3D(1,1,1);
     this->rotation = QVector4D(0,0,0,1);
-    collider = new Collider(newMesh);
     transform = new Transform();
 }
 
@@ -19,7 +18,6 @@ GameObject::GameObject(Mesh3D *newMesh, GameObject* parent)
     scale = QVector3D(1,1,1);
     rotation = QVector4D(0,0,0,1);
     setParent(parent);
-    collider = new Collider(newMesh);
     transform = new Transform();
 }
 

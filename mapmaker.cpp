@@ -81,8 +81,8 @@ void  MapMaker::CreateLevel(QString mapfile,std::vector<GameObject*> *resList)
                     }
                     resList->push_back(new GameObject(m));
 
-                    float x = i;//-(X/2) + i;
-                    float y = j;//-(Y/2) + j;
+                    float x = -(X/2.0) + i;
+                    float y = -(Y/2.0) + j;
                     resList->at(resList->size() - 1)->transform->position = QVector3D(x*2, y*2, Z*2);
                     m->Compute(resList->at(resList->size() - 1)->transform);
                 }

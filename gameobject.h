@@ -6,11 +6,11 @@
 #include "mesh.h"
 #include "transform.h"
 #include "component.h"
+#include "collidercomponent.h"
 
 class GameObject
 {
 public:
-
     GameObject(Mesh3D *newMesh);
     GameObject(Mesh3D *newMesh, GameObject* parent);
 
@@ -34,11 +34,12 @@ public:
     int test;
     QVector3D position;
     QVector3D scale;
-    QVector4D rotation; // Quaternion <3
-    Collider* collider;
+    QVector4D rotation;
     Mesh3D *mesh;
     Transform *transform;
     std::vector<Component *> components;
+    ColliderComponent *collider;
+
 
 private:
     GameObject* parent;

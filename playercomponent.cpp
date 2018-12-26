@@ -8,21 +8,16 @@ PlayerComponent::PlayerComponent()
 
 void PlayerComponent::Do()
 {
-    //double dT = MainWidget::deltaTime;
-    /*QVector3D pos = gameObject->transform->GetPosition();
-    pos = pos - QVector3D(0,0,-9) * dT;
-    gameObject->transform->SetPosition(pos);*/
-    Move();
+   Move();
 }
 
 void PlayerComponent::Move()
 {
-    float dy = (input->inputMap["up"] - input->inputMap["down"]);
-    float dx = (input->inputMap["right"] - input->inputMap["left"]);
+    // On va tester si le mouvement rentre en collision ou pas
+    float dx = InputMapping::inputMap["VerticalAxis"];   // Déplacement vertical
+    float dy = InputMapping::inputMap["HorizontalAxis"]; // Déplacement horizontal
     QVector3D moveVect(dx, dy, 0);
-    QVector3D pos = gameObject->transform->GetPosition();
-    //pos = pos + moveVect;
-    gameObject->SetPosition(pos);
-    input->printMap();
-    //gameObject->transform->SetPosition(pos);
+    //gameObject->transform->position += moveVect;
+    gameObject->collider->Move(moveVect * MainWidget::deltaTime * 10);
 }
+

@@ -55,28 +55,22 @@
 #include <collider.h>
 #include "playercomponent.h"
 #include "mapmaker.h"
+#include "boxcollidercomponent.h"
 
 double MainWidget::deltaTime = 0;
-//#include <math.h>
 
 MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     QOpenGLWidget(parent),
-    geometries1(0),
-    geometries2(0),
     texture(0),
     angularSpeed(0),
     timeScale(1.0f)
-
 {
     timeFrequence = 1.0/frequence*1000;
     season = seasonStart;
     z = 0;
-    inputMapping = new InputMapping();
     setMouseTracking(true);
     applicationTime = 0;
     MainWidget::deltaTime = 0;
-
-
 }
 
 MainWidget::~MainWidget()
@@ -85,8 +79,6 @@ MainWidget::~MainWidget()
     // and the buffers.
     makeCurrent();
     delete texture;
-    delete geometries1;
-    delete geometries2;
     doneCurrent();
 }
 
@@ -98,63 +90,22 @@ bool MainWidget::event(QEvent *event)
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
         if (ke->key() == Qt::Key_Z)
         {
-            inputMapping->inputMap["up"] = 1;
+            InputMapping::inputMap["HorizontalAxis"] = 1.0;
         }
-        else
+        else if (ke->key() == Qt::Key_S)
         {
-            inputMapping->inputMap["up"] = 0;
+            InputMapping::inputMap["HorizontalAxis"] = -1.0;
         }
-        if (ke->key() == Qt::Key_S)
-        {
-            inputMapping->inputMap["down"] = 1;
-        }
-        else
-        {
-            inputMapping->inputMap["down"] = 0;
-        }
-        if (ke->key() == Qt::Key_Q)
-        {
-            inputMapping->inputMap["left"] = 1;
-        }
-        else
-        {
-            inputMapping->inputMap["left"] = 0;
-        }
+
         if (ke->key() == Qt::Key_D)
         {
-            inputMapping->inputMap["right"] = 1;
+            InputMapping::inputMap["VerticalAxis"] = 1.0;
         }
-        else
+        else if (ke->key() == Qt::Key_Q)
         {
-            inputMapping->inputMap["right"] = 0;
+            InputMapping::inputMap["VerticalAxis"] = -1.0;
         }
 
-        if (ke->key() == Qt::Key_Up)
-        {
-            inputMapping->inputMap["cameraZ"] = 1;
-        }
-        if (ke->key() == Qt::Key_Down)
-        {
-            inputMapping->inputMap["cameraZ"] = -1;
-        }
-        if (ke->key() == Qt::Key_Left)
-        {
-            inputMapping->inputMap["cameraHorizontal"] = 1;
-        }
-        if (ke->key() == Qt::Key_Right)
-        {
-            inputMapping->inputMap["cameraHorizontal"] = -1;
-        }
-
-        if (ke->key() == Qt::Key_Plus)
-        {
-            inputMapping->inputMap["cameraZoom"] = inputMapping->inputMap["cameraZoom"] - 0.5;
-        }
-
-        if (ke->key() == Qt::Key_Minus)
-        {
-            inputMapping->inputMap["cameraZoom"] = inputMapping->inputMap["cameraZoom"] + 0.5;
-        }
         return true;
     } else if (event->type() == QEvent::MouseMove) {
         /*QMouseEvent *mouse = static_cast<QMouseEvent *>(event);
@@ -265,28 +216,55 @@ void MainWidget::initializeGL()
 
    //gameObjects.push_back(G2);
    //gameObjects.push_back(G4);*/
+
     PlayerComponent *pc = new PlayerComponent();
-    pc->input = inputMapping;
     Mesh3D *m5 = new Mesh3D();
     m5->Load("../ProjectMDJ/block.obj");
     m5->LoadTexture("../ProjectMDJ/PlayerTexture.png");
+
     playerObject = new GameObject(m5);
+
     pc->gameObject = playerObject;
-    playerObject->SetScale(QVector3D(0.5,0.5,0.5));
     playerObject->components.push_back(pc);
-    playerObject->SetPosition(QVector3D(0, 0, 3));
-   MapMaker mapMaker;
-   //gameObjects =
-   mapMaker.CreateLevel("../ProjectMDJ/level02.txt", &gameObjects);
 
-   Mesh3D *m3 = new Mesh3D();
-   m3->Load("../ProjectMDJ/skybox.obj");
-   m3->texture = new QOpenGLTexture(QImage(":/Daylight Box UV.png").mirrored());
-   skybox = new GameObject(m3);
-   m3->Compute(skybox->transform);
-   m_time.start();
+    GravityComponent *gc = new GravityComponent();
+    gc->gameObject = playerObject;
+    playerObject->components.push_back(gc);
 
+    playerObject->transform->position = QVector3D(0, 0, 9);
+    MapMaker mapMaker;
+
+
+    // Creation du niveau
+    mapMaker.CreateLevel("../ProjectMDJ/level02.txt", &gameObjects);
+
+    for (unsigned int i = 0 ; i < gameObjects.size(); i ++)
+    {
+        BoxColliderComponent *bc = new BoxColliderComponent();
+        bc->size = QVector3D(1,1,1);
+
+
+        bc->gameObjects = &gameObjects;
+        bc->center = gameObjects[i]->transform->position;
+        gameObjects[i]->collider = bc;
+        bc->gameObject = gameObjects[i];
+    }
+
+    BoxColliderComponent *bc = new BoxColliderComponent();
+    bc->size = QVector3D(1,1,1)*0.95f;
+    bc->gameObjects = &gameObjects;
+    bc->center = playerObject->transform->position;
+    playerObject->collider = bc;
+    bc->gameObject = playerObject;
+
+    Mesh3D *m3 = new Mesh3D();
+    m3->Load("../ProjectMDJ/skybox.obj");
+    m3->texture = new QOpenGLTexture(QImage(":/Daylight Box UV.png").mirrored());
+    skybox = new GameObject(m3);
+    m3->Compute(skybox->transform);
+    m_time.start();
 }
+
 
 void MainWidget::seasonChange()
 {
@@ -367,33 +345,24 @@ void MainWidget::resizeGL(int w, int h)
 
 void MainWidget::paintGL()
 {
-    //inputMapping->reset();
-    // Clear color and depth buffer
-   // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    int MatSpec [4] = {1,1,1,1};
-    //glMaterialiv(GL_FRONT_AND_BACK,GL_SPECULAR,MatSpec);
-    //glMateriali(GL_FRONT_AND_BACK,GL_SHININESS,100);
+
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glMatrixMode(GL_MODELVIEW);
     texture->bind();
     MainWidget::deltaTime = m_time.elapsed() / 1000.0f;
 
-//! [6]
-    // Calculate model view transformation
     QMatrix4x4 matrix;
-    //matrix.translate(0.0, 0, .0);
-    //matrix.rotate(rotation);
-
-    applicationTime += inputMapping->inputMap["cameraHorizontal"] * MainWidget::deltaTime;
-    posCamera = QVector3D(35*sin(applicationTime),35*cos(applicationTime),15);
+    //applicationTime += InputMapping::inputMap["VerticalAxis"]*0.05;
+    //posCamera += ((QVector3D(35*sin(applicationTime),-35*cos(applicationTime),15) + playerObject->transform->position) - posCamera) * 0.05f;
+    posCamera = QVector3D(25*sin(applicationTime),-25*cos(applicationTime),25);
+    targetCamera += (playerObject->transform->position - targetCamera) *0.05f;
     matrix.lookAt(posCamera, // Eye
-                  QVector3D(0,0,0), // Center
+                  targetCamera, // Center
                   QVector3D(0,0,1)); // Normal
 
-    Mesh3D::vectorCamera = (QVector3D(0,0,0) - posCamera).normalized();
-    // Set modelview-projection matrixç
+    Mesh3D::vectorCamera = (playerObject->transform->position - posCamera).normalized();
+
     program.setUniformValue("mvp_matrix", projection * matrix);
-//! [6]
 
     // Use texture unit 0 which contains cube.png
     program.setUniformValue("texture", 0);
@@ -401,25 +370,24 @@ void MainWidget::paintGL()
     skybox->Draw(&program);
 
 
-    /*QQuaternion q = gameObjects[0]->transform->GetRotation() + QQuaternion(100,1,0,0);
-    gameObjects[0]->transform->SetRotation(q.normalized());*/
-    playerObject->components[0]->Do();
-    //std::cout <<"Size: " << playerObject->components.size() << std::endl;
+
+    for (unsigned int i = 0; i < playerObject->components.size(); i++)
+    {
+        playerObject->components[i]->Do();
+    }
+    std::cout << playerObject << std::endl;
+    playerObject->mesh->Compute(playerObject->transform);
     playerObject->Draw(&program);
 
+
+    //playerObject->transform->position += QVector3D(InputMapping::inputMap["HorizontalAxis"], InputMapping::inputMap["VerticalAxis"],0);
     for (unsigned int i = 0; i < gameObjects.size(); i++)
     {
         gameObjects[i]->Draw(&program);
     }
-
-
-    inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] + (inputMapping->inputMap["axisHori"] * (deltaTime/1000.0)*5);
-    inputMapping->inputMap["cameraInertie"] = inputMapping->inputMap["cameraInertie"] * 0.97;
-
-    //applicationTime += inputMapping->inputMap["cameraInertie"];
-
-
     //
+    //std::cout << "[" << playerObject->transform->position.x() << "," << playerObject->transform->position.y() << "," << playerObject->transform->position.z() << "]" << std::endl;
+    InputMapping::Reset();
     m_time.restart();
     update();
 

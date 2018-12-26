@@ -11,7 +11,6 @@ public:
     void Do();
     void Move();
 
-    InputMapping *input;
     GameObject *gameObject;
 };
 

@@ -322,6 +322,8 @@ void Mesh3D::Compute(Transform *transform)
     //QVector3D vectCam(1,-1,-1);
     vectCam.normalize();
     int index = 0;
+    outVertexData = {};
+    outIndexData = {};
     for( unsigned int i=0; i < mesh->trianglesIndex.size(); i+=3 )
     {
 

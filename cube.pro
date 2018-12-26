@@ -9,32 +9,34 @@ SOURCES += main.cpp \
     gameobject.cpp \
     collider.cpp \
     timer_manager.cpp \
-    gravity.cpp \
     inputmapping.cpp \
     camera.cpp \
     transform.cpp \
     component.cpp \
     playercomponent.cpp \
-    mapmaker.cpp
+    mapmaker.cpp \
+    gravitycomponent.cpp \
+    boxcollidercomponent.cpp \
+    collidercomponent.cpp
 
 SOURCES += \
-    mainwidget.cpp \
-    geometryengine.cpp
+    mainwidget.cpp
 
 HEADERS += \
     mainwidget.h \
-    geometryengine.h \
     mesh.h \
     gameobject.h \
     collider.h \
     timer_manager.h \
-    gravity.h \
     inputmapping.h \
     camera.h \
     transform.h \
     component.h \
     playercomponent.h \
-    mapmaker.h
+    mapmaker.h \
+    gravitycomponent.h \
+    boxcollidercomponent.h \
+    collidercomponent.h
 
 RESOURCES += \
     shaders.qrc \
