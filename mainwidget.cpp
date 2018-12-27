@@ -70,6 +70,8 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     z = 0;
     setMouseTracking(true);
     applicationTime = 0;
+    rotate = 0;
+    heightCamera = 25;
     MainWidget::deltaTime = 0;
 }
 
@@ -106,6 +108,29 @@ bool MainWidget::event(QEvent *event)
             InputMapping::inputMap["VerticalAxis"] = -1.0;
         }
 
+        if (ke->key() == Qt::Key_Left)
+        {
+            InputMapping::inputMap["CameraHorizontalAxis"] = -1.0;
+        }
+        else if (ke->key() == Qt::Key_Right)
+        {
+            InputMapping::inputMap["CameraHorizontalAxis"] = 1.0;
+        }
+
+        if (ke->key() == Qt::Key_Down)
+        {
+            InputMapping::inputMap["CameraVerticalAxis"] = -1.0;
+        }
+        else if (ke->key() == Qt::Key_Up)
+        {
+            InputMapping::inputMap["CameraVerticalAxis"] = 1.0;
+        }
+
+        if (ke->key() == Qt::Key_Space)
+        {
+            GravityComponent::gravity *= -1;
+        }
+
         return true;
     } else if (event->type() == QEvent::MouseMove) {
         /*QMouseEvent *mouse = static_cast<QMouseEvent *>(event);
@@ -130,7 +155,7 @@ void MainWidget::DrawMesh(GameObject *gameObject)
 
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    applicationTime += 0 * timeScale;
+
     update();
 }
 
@@ -231,7 +256,7 @@ void MainWidget::initializeGL()
     gc->gameObject = playerObject;
     playerObject->components.push_back(gc);
 
-    playerObject->transform->position = QVector3D(0, 0, 9);
+    playerObject->transform->position = QVector3D(0, 0, 12);
     MapMaker mapMaker;
 
 
@@ -251,7 +276,8 @@ void MainWidget::initializeGL()
     }
 
     BoxColliderComponent *bc = new BoxColliderComponent();
-    bc->size = QVector3D(1,1,1)*0.95f;
+    bc->size = QVector3D(1,1,1)*0.875f;
+    playerObject->transform->scale *= 0.875f;
     bc->gameObjects = &gameObjects;
     bc->center = playerObject->transform->position;
     playerObject->collider = bc;
@@ -261,6 +287,7 @@ void MainWidget::initializeGL()
     m3->Load("../ProjectMDJ/skybox.obj");
     m3->texture = new QOpenGLTexture(QImage(":/Daylight Box UV.png").mirrored());
     skybox = new GameObject(m3);
+    skybox->transform->scale *= 3;
     m3->Compute(skybox->transform);
     m_time.start();
 }
@@ -333,7 +360,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 150.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 500.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -352,15 +379,21 @@ void MainWidget::paintGL()
     MainWidget::deltaTime = m_time.elapsed() / 1000.0f;
 
     QMatrix4x4 matrix;
-    //applicationTime += InputMapping::inputMap["VerticalAxis"]*0.05;
-    //posCamera += ((QVector3D(35*sin(applicationTime),-35*cos(applicationTime),15) + playerObject->transform->position) - posCamera) * 0.05f;
-    posCamera = QVector3D(25*sin(applicationTime),-25*cos(applicationTime),25);
+
+    rotate += InputMapping::inputMap["CameraHorizontalAxis"] *0.25 ;
+    applicationTime += (rotate - applicationTime) * 0.1;
+
+    heightCamera += InputMapping::inputMap["CameraVerticalAxis"];
+    posCamera = QVector3D(25*sin(applicationTime),-25*cos(applicationTime),heightCamera);
     targetCamera += (playerObject->transform->position - targetCamera) *0.05f;
+
+
     matrix.lookAt(posCamera, // Eye
                   targetCamera, // Center
                   QVector3D(0,0,1)); // Normal
 
-    Mesh3D::vectorCamera = (playerObject->transform->position - posCamera).normalized();
+
+    Mesh3D::vectorCamera = (targetCamera - posCamera).normalized();
 
     program.setUniformValue("mvp_matrix", projection * matrix);
 
@@ -375,7 +408,7 @@ void MainWidget::paintGL()
     {
         playerObject->components[i]->Do();
     }
-    std::cout << playerObject << std::endl;
+
     playerObject->mesh->Compute(playerObject->transform);
     playerObject->Draw(&program);
 
@@ -385,8 +418,12 @@ void MainWidget::paintGL()
     {
         gameObjects[i]->Draw(&program);
     }
-    //
-    //std::cout << "[" << playerObject->transform->position.x() << "," << playerObject->transform->position.y() << "," << playerObject->transform->position.z() << "]" << std::endl;
+
+    if (playerObject->transform->position.z() < -3)
+    {
+        playerObject->collider->Teleport(QVector3D(0,0,15));
+    }
+
     InputMapping::Reset();
     m_time.restart();
     update();

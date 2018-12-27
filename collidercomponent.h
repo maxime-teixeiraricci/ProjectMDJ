@@ -20,6 +20,10 @@ public:
     {
         std::cout << "B" << std::endl;
     }
+    virtual void Teleport(QVector3D pos)
+    {
+        std::cout << "B" << std::endl;
+    }
 };
 
 #endif // COLLIDERCOMPONENT_H

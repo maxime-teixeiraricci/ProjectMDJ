@@ -130,7 +130,9 @@ private:
 
     double time;
     double timeScale;
+    double rotate;
     double applicationTime;
+    double heightCamera;
     double timeFrequence;
 
 };

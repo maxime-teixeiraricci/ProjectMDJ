@@ -13,6 +13,7 @@ public:
     bool Collide(BoxColliderComponent *collider);
     //bool Collide(ColliderComponent *collider);
     void Move(QVector3D moveVect);
+    void Teleport(QVector3D pos);
     std::vector<GameObject *> *gameObjects;
     GameObject *gameObject;
 

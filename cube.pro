@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     mapmaker.cpp \
     gravitycomponent.cpp \
     boxcollidercomponent.cpp \
-    collidercomponent.cpp
+    collidercomponent.cpp \
+    rotationcomponent.cpp
 
 SOURCES += \
     mainwidget.cpp
@@ -36,7 +37,8 @@ HEADERS += \
     mapmaker.h \
     gravitycomponent.h \
     boxcollidercomponent.h \
-    collidercomponent.h
+    collidercomponent.h \
+    rotationcomponent.h
 
 RESOURCES += \
     shaders.qrc \

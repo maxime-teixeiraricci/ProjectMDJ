@@ -7,6 +7,7 @@
 class PlayerComponent: public Component
 {
 public:
+    //static
     PlayerComponent();
     void Do();
     void Move();

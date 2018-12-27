@@ -10,7 +10,7 @@ public:
     GravityComponent();
     void Do();
     GameObject *gameObject;
-    QVector3D gravity;
+    static QVector3D gravity;
 };
 
 #endif // GRAVITYCONPONENT_H

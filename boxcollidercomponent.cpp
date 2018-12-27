@@ -43,12 +43,29 @@ void BoxColliderComponent::Move(QVector3D moveVect)
 
         if ( Collide(bc) )
         {
-            std::cout << "Collision ["<< moveVect.x() <<", "<< moveVect.y() << ", " << moveVect.z() << "]" << std::endl;
             center = currentCenter;
             return;
         }
     }
     //center = currentCenter;
     gameObject->transform->position += moveVect;
+
+}
+
+void BoxColliderComponent::Teleport(QVector3D pos)
+{
+    QVector3D currentCenter = center;
+    center = pos;
+    for (unsigned int i = 0; i < gameObjects->size(); i++)
+    {
+        BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (gameObjects->at(i)->collider);
+        if ( Collide(bc) )
+        {
+            center = currentCenter;
+            return;
+        }
+    }
+    //center = currentCenter;
+    gameObject->transform->position = pos;
 
 }
