@@ -21,6 +21,10 @@ void PlayerComponent::Move()
     QVector3D right = QVector3D::crossProduct(forward, QVector3D(0,0,1));
 
     QVector3D v = forward * dy + right * dx;
-    gameObject->collider->Move(v * MainWidget::deltaTime * 25);
+
+    // Pour eviter des artefacts dans les déplacements liés à une chute de FrameRate
+    double dt = std::min((1/30.0) , MainWidget::deltaTime);
+
+    gameObject->collider->Move(v * dt * 25);
 }
 

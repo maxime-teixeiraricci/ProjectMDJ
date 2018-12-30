@@ -13,17 +13,19 @@ public:
     ColliderComponent();
     virtual bool Collide(ColliderComponent *collider)
     {
-        std::cout << "A" << std::endl;
+        std::cout << "ColliderComponent : Collider Not Implement" << std::endl;
         return false;
     }
     virtual void Move(QVector3D moveVect)
     {
-        std::cout << "B" << std::endl;
+        std::cout << "ColliderComponent : Move Not Implement" << std::endl;
     }
     virtual void Teleport(QVector3D pos)
     {
-        std::cout << "B" << std::endl;
+         std::cout << "ColliderComponent : Teleport Not Implement" << std::endl;
     }
+
+    bool isTrigger = false;
 };
 
 #endif // COLLIDERCOMPONENT_H

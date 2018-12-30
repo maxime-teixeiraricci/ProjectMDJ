@@ -19,7 +19,9 @@ SOURCES += main.cpp \
     boxcollidercomponent.cpp \
     collidercomponent.cpp \
     rotationcomponent.cpp \
-    starcollectcomponent.cpp
+    starcollectcomponent.cpp \
+    switchcomponent.cpp \
+    colorblockcomponent.cpp
 
 SOURCES += \
     mainwidget.cpp
@@ -40,7 +42,9 @@ HEADERS += \
     boxcollidercomponent.h \
     collidercomponent.h \
     rotationcomponent.h \
-    starcollectcomponent.h
+    starcollectcomponent.h \
+    switchcomponent.h \
+    colorblockcomponent.h
 
 RESOURCES += \
     shaders.qrc \

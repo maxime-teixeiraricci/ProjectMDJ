@@ -198,7 +198,7 @@ void MainWidget::initializeGL()
 
 
     // Creation du niveau
-    mapMaker.CreateLevel("../ProjectMDJ/level02.txt");
+    mapMaker.CreateLevel("../ProjectMDJ/level03.txt");
 /*
     for (unsigned int i = 0 ; i < gameObjects.size(); i ++)
     {
@@ -323,8 +323,8 @@ void MainWidget::paintGL()
     applicationTime += (rotate - applicationTime) * 0.1;
 
     heightCamera += InputMapping::inputMap["CameraVerticalAxis"] * -GravityComponent::GetDirection() ;
-    posCamera = QVector3D(25*sin(applicationTime),-25*cos(applicationTime),heightCamera);
-    targetCamera += (playerObject->transform->position - targetCamera) *0.05f;
+    posCamera = QVector3D(25*sin(applicationTime),-25*cos(applicationTime),- GravityComponent::GetDirection() *heightCamera);
+    targetCamera += (playerObject->transform->position * 0.5 - targetCamera) *0.05f;
 
 
     matrix.lookAt(posCamera, // Eye

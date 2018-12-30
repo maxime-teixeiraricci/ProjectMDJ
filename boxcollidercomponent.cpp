@@ -1,4 +1,5 @@
 #include "boxcollidercomponent.h"
+#include "QColor"
 
 BoxColliderComponent::BoxColliderComponent()
 {
@@ -32,27 +33,32 @@ bool BoxColliderComponent::Collide(BoxColliderComponent *collider)
 }
 
 
+
+
 void BoxColliderComponent::Move(QVector3D moveVect)
 {
-
+    int precision = 10;
     QVector3D currentCenter = center;
     center += moveVect;
-    for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
+    for (int k = 0 ; k < precision; k ++)
     {
-        if (MainWidget::gameObjects.at(i)->collider != nullptr)
+        for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
         {
-            std::cout << "J : " << i << std::endl;
-            BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (MainWidget::gameObjects.at(i)->collider);
-            if ( Collide(bc) )
+            if (MainWidget::gameObjects.at(i) != gameObject &&
+                    MainWidget::gameObjects.at(i)->collider != nullptr &&
+                    !MainWidget::gameObjects.at(i)->collider->isTrigger)
             {
-                center = currentCenter;
-                return;
+                BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (MainWidget::gameObjects.at(i)->collider);
+                if ( Collide(bc) )
+                {
+                    center = currentCenter;
+                    return;
+                }
             }
-        }
 
+        }
+        gameObject->transform->position += moveVect / (1.0f * precision);
     }
-    //center = currentCenter;
-    gameObject->transform->position += moveVect;
 
 }
 
@@ -64,7 +70,6 @@ void BoxColliderComponent::Teleport(QVector3D pos)
     {
         if (MainWidget::gameObjects.at(i)->collider != nullptr)
         {
-            std::cout << "J : " << i << std::endl;
             BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (MainWidget::gameObjects.at(i)->collider);
             if ( Collide(bc) )
             {

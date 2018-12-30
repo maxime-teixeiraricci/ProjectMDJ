@@ -5,6 +5,8 @@
 #include "rotationcomponent.h"
 #include "starcollectcomponent.h"
 #include "boxcollidercomponent.h"
+#include "switchcomponent.h"
+#include "colorblockcomponent.h"
 
 #include <stdlib.h>
 
@@ -77,45 +79,118 @@ void  MapMaker::CreateLevel(QString mapfile)
 
                     bc->center = gameObject->transform->position;
 
-
-                    switch (c)
+                    if (c == 'H')
                     {
-                    case 'H':  // Block d'herbe
                         m->Load("../ProjectMDJ/block.obj");
                         m->LoadTexture("../ProjectMDJ/grass.png");
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
+                    }
+                    else if (c == 'W')
+                    {
+                        m->Load("../ProjectMDJ/block.obj");
+                        m->LoadTexture("../ProjectMDJ/grass.png");
+                        gameObject->collider = bc;
+                        bc->gameObject = gameObject;
+                    }
+                    else if (c == 'X')
+                    {
+                        m->Load("../ProjectMDJ/block.obj");
+                        m->LoadTexture("../ProjectMDJ/block.png");
+                        gameObject->collider = bc;
+                        bc->size = QVector3D(1,1,1)*0.875f;
 
-                        break;
-                    case 'W':  // Block d'eau
-                        m->Load("../ProjectMDJ/block.obj");
-                        m->LoadTexture("../ProjectMDJ/grass.png");
+                        bc->gameObject = gameObject;
+                        GravityComponent *gc = new GravityComponent();
+                        gc->gameObject = gameObject;
+                        gameObject->components.push_back(gc);
+                        gameObject->transform->scale *= 0.875f;
+                    }
+                    else if (c == 'Q')
+                    {
+                        m->Load("../ProjectMDJ/switchUp.obj");
+                        m->LoadTexture("../ProjectMDJ/redSwitch.png");
+                        SwitchComponent *sc = new SwitchComponent();
+                        sc->gameObject = gameObject;
+                        sc->startState = false;
+                        sc->ChangeColor();
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
-                        break;
-                    case 'S':  // Block en pente
-                        m->Load("../ProjectMDJ/slope.obj");
-                        m->LoadTexture("../ProjectMDJ/grass.png");
+                        bc->size = QVector3D(1,1,1)*0.75f;
+                        bc->isTrigger = true;
+                        gameObject->components.push_back(sc);
+                    }
+                    else if (c == 'Z')
+                    {
+                        m->Load("../ProjectMDJ/switchUp.obj");
+                        m->LoadTexture("../ProjectMDJ/blueSwitch.png");
+                        SwitchComponent *sc = new SwitchComponent();
+                        sc->gameObject = gameObject;
+                        sc->startState = true;
+                        sc->ChangeColor();
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
-                        break;
-                    case 'T':  // Block en terre
+                        bc->size = QVector3D(1,1,1)*0.75f;
+                        bc->isTrigger = true;
+                        gameObject->components.push_back(sc);
+                    }
+                    else if (c == 'T')
+                    {
                         m->Load("../ProjectMDJ/block.obj");
                         m->LoadTexture("../ProjectMDJ/mud.png");
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
-                        break;
-                    case '1':
-                        m->Load("../ProjectMDJ/wiredCube.obj");
+                    }
+                    else if (c == '1')
+                    {
+                        m->Load("../ProjectMDJ/fullCube.obj");
                         m->LoadTexture("../ProjectMDJ/redBlock.png");
 
-                        break;
-                    case '2':
-                        m->Load("../ProjectMDJ/wiredCube.obj");
+                        ColorBlockComponent *cbc = new ColorBlockComponent();
+
+                        Mesh3D *m1 = new Mesh3D();
+                        m1->Load("../ProjectMDJ/wiredCube.obj");
+                        m1->LoadTexture("../ProjectMDJ/redBlock.png");
+                        cbc->meshes.push_back(m1);
+
+                        Mesh3D *m2 = new Mesh3D();
+                        m2->Load("../ProjectMDJ/fullCube.obj");
+                        m2->LoadTexture("../ProjectMDJ/redBlock.png");
+                        cbc->meshes.push_back(m2);
+                        gameObject->components.push_back(cbc);
+                        cbc->gameObject = gameObject;
+                        cbc->startState = false;
+
+                        gameObject->collider = bc;
+                        bc->gameObject = gameObject;
+                        bc->isTrigger= true;
+                    }
+                    else if (c == '2')
+                    {
+                        m->Load("../ProjectMDJ/fullCube.obj");
                         m->LoadTexture("../ProjectMDJ/blueBlock.png");
 
-                        break;
-                    case 'C':
+                        ColorBlockComponent *cbc = new ColorBlockComponent();
+
+                        Mesh3D *m1 = new Mesh3D();
+                        m1->Load("../ProjectMDJ/wiredCube.obj");
+                        m1->LoadTexture("../ProjectMDJ/blueBlock.png");
+                        cbc->meshes.push_back(m1);
+
+                        Mesh3D *m2 = new Mesh3D();
+                        m2->Load("../ProjectMDJ/fullCube.obj");
+                        m2->LoadTexture("../ProjectMDJ/blueBlock.png");
+                        cbc->meshes.push_back(m2);
+                        gameObject->components.push_back(cbc);
+                        cbc->gameObject = gameObject;
+                        cbc->startState = true;
+
+                        gameObject->collider = bc;
+                        bc->gameObject = gameObject;
+                        bc->isTrigger= true;
+                    }
+                    else if (c == 'C')
+                    {
                         m->Load("../ProjectMDJ/star.obj");
                         m->LoadTexture("../ProjectMDJ/gold.png");
 
@@ -127,9 +202,12 @@ void  MapMaker::CreateLevel(QString mapfile)
                         StarCollectComponent *scc = new StarCollectComponent();
                         scc->gameObject = gameObject;
                         gameObject->components.push_back(scc);
-                        break;
-
                     }
+                    else {
+                        std::cout << c << " letter not known ! " << std::endl;
+                        break;
+                    }
+
                     (MainWidget::gameObjects).push_back(gameObject);
                     m->Compute(gameObject->transform);
                 }
