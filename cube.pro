@@ -1,4 +1,4 @@
-QT       += core gui widgets opengl
+QT       += core gui widgets opengl gamepad
 
 TARGET = cube
 TEMPLATE = app
@@ -21,7 +21,8 @@ SOURCES += main.cpp \
     rotationcomponent.cpp \
     starcollectcomponent.cpp \
     switchcomponent.cpp \
-    colorblockcomponent.cpp
+    colorblockcomponent.cpp \
+    invisibiltycomponent.cpp
 
 SOURCES += \
     mainwidget.cpp
@@ -44,7 +45,8 @@ HEADERS += \
     rotationcomponent.h \
     starcollectcomponent.h \
     switchcomponent.h \
-    colorblockcomponent.h
+    colorblockcomponent.h \
+    invisibiltycomponent.h
 
 RESOURCES += \
     shaders.qrc \

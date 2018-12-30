@@ -68,6 +68,7 @@ public:
     void KDopCompute();
     QVector3D origin;
     int test;
+    bool isDrawable = true;
 
     QColor color;
 

@@ -20,15 +20,20 @@ public:
     QVector3D GetScale();
 
     QMatrix4x4 transformMatrix;
+
     QVector3D position;
     QVector3D scale;
     QQuaternion rotation;
+
+
     QVector3D eulerAngle;
 
     void getMatrix();
     void Rotate();
     void Translate();
     void Scale();
+
+
 
 private:
 

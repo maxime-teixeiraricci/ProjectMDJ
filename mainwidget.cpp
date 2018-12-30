@@ -56,10 +56,12 @@
 #include "playercomponent.h"
 #include "mapmaker.h"
 #include "boxcollidercomponent.h"
+#include "QtGamepad/QGamepadManager"
 
 double MainWidget::deltaTime = 0;
 GameObject* MainWidget::playerObject = nullptr;
 std::vector<GameObject *> MainWidget::gameObjects;
+QVector3D MainWidget::startPosition = QVector3D(0,0,0);
 
 MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     QOpenGLWidget(parent),
@@ -89,6 +91,16 @@ MainWidget::~MainWidget()
 bool MainWidget::event(QEvent *event)
 {
     //inputMapping->reset();
+
+    if (QGamepadManager::instance()->connectedGamepads().size() > 0 )
+    {
+        QGamepad *gamepad = new QGamepad(0);
+        if (gamepad->buttonStart())
+        {
+            GravityComponent::gravity *= -1;
+        }
+    }
+
     if (event->type() == QEvent::KeyPress)
     {
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
@@ -145,15 +157,7 @@ bool MainWidget::event(QEvent *event)
     return QWidget::event(event);
 }
 
-void MainWidget::DrawMesh(GameObject *gameObject)
-{
-    gameObject->Draw(&program);
-    for (unsigned int i = 0; i < gameObject->numberChildren();i++)
-    {
-       gameObject->getChild(i)->Draw(&program);
-    }
 
-}
 
 void MainWidget::timerEvent(QTimerEvent *)
 {
@@ -193,12 +197,12 @@ void MainWidget::initializeGL()
     gc->gameObject = playerObject;
     playerObject->components.push_back(gc);
 
-    playerObject->transform->position = QVector3D(0, 0, 15);
     MapMaker mapMaker;
 
 
     // Creation du niveau
-    mapMaker.CreateLevel("../ProjectMDJ/level03.txt");
+    mapMaker.CreateLevel("../ProjectMDJ/level02.txt");
+    playerObject->transform->SetPosition(startPosition);
 /*
     for (unsigned int i = 0 ; i < gameObjects.size(); i ++)
     {
@@ -311,67 +315,73 @@ void MainWidget::resizeGL(int w, int h)
 
 void MainWidget::paintGL()
 {
-
-
+    QTime paintTime = QTime();
+    paintTime.start();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     texture->bind();
-    MainWidget::deltaTime = m_time.elapsed() / 1000.0f;
+
 
     QMatrix4x4 matrix;
-
-    rotate += InputMapping::inputMap["CameraHorizontalAxis"] *0.25 ;
-    applicationTime += (rotate - applicationTime) * 0.1;
-
-    heightCamera += InputMapping::inputMap["CameraVerticalAxis"] * -GravityComponent::GetDirection() ;
-    posCamera = QVector3D(25*sin(applicationTime),-25*cos(applicationTime),- GravityComponent::GetDirection() *heightCamera);
-    targetCamera += (playerObject->transform->position * 0.5 - targetCamera) *0.05f;
-
-
     matrix.lookAt(posCamera, // Eye
                   targetCamera, // Center
                   QVector3D(0,0,1) * -GravityComponent::GetDirection()); // Normal
-
-
     Mesh3D::vectorCamera = (targetCamera - posCamera).normalized();
-
     program.setUniformValue("mvp_matrix", projection * matrix);
-
     // Use texture unit 0 which contains cube.png
     program.setUniformValue("texture", 0);
-
     skybox->Draw(&program);
+    playerObject->Draw(&program);
+    for (unsigned int i = 0; i < gameObjects.size(); i++)
+    {
+        if (gameObjects[i]->mesh->isDrawable) gameObjects[i]->Draw(&program);
+    }
 
 
+    InputMapping::Reset();
+
+
+    std::cout << "Paint Time : " << paintTime.elapsed() << "ms [" << 1.0/(paintTime.elapsed()/1000.0) <<"]"<< std::endl;
+    paintTime.restart();
+    update();
+
+}
+
+void MainWidget::Update()
+{
+    m_time.restart();
+
+    QTime updateTime = QTime();
+    updateTime.start();
+    rotate += InputMapping::inputMap["CameraHorizontalAxis"] *0.25 ;
+    applicationTime += (rotate - applicationTime) * 0.1;
+
+    heightCamera += InputMapping::inputMap["CameraVerticalAxis"];
+    posCamera = QVector3D(25*sin(applicationTime),-25*cos(applicationTime),heightCamera);
+    targetCamera += (playerObject->transform->position * 0.5 - targetCamera) *0.05f;
 
     for (unsigned int i = 0; i < playerObject->components.size(); i++)
     {
+
         playerObject->components[i]->Do();
     }
-
     playerObject->mesh->Compute(playerObject->transform);
-    playerObject->Draw(&program);
-
-
-    //playerObject->transform->position += QVector3D(InputMapping::inputMap["HorizontalAxis"], InputMapping::inputMap["VerticalAxis"],0);
     for (unsigned int i = 0; i < gameObjects.size(); i++)
     {
 
         for (unsigned int j = 0; j < gameObjects[i]->components.size(); j++)
         {
-
             gameObjects[i]->components[j]->Do();
         }
-        gameObjects[i]->Draw(&program);
     }
 
     if (playerObject->transform->position.z() < -5 || playerObject->transform->position.z() > 20)
     {
-        playerObject->collider->Teleport(QVector3D(0,0,18));
+        playerObject->collider->Teleport(startPosition);
         if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
     }
 
-    InputMapping::Reset();
-    m_time.restart();
-    update();
+    std::cout << "Update Time : " << updateTime.elapsed() << "ms [" << 1.0/(updateTime.elapsed()/1000.0) <<"]"<< std::endl;
+    updateTime.restart();
+    MainWidget::deltaTime = m_time.elapsed() / 1000.0f;
 
 }

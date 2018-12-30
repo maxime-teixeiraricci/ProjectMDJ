@@ -76,16 +76,6 @@ int main(int argc, char *argv[])
 
     //Création des 4 widgets;*/
     MainWidget *widget1 = new MainWidget(60,0);
-    /*
-    MainWidget *widget2 = new MainWidget(60,1);
-    MainWidget *widget3 = new MainWidget(60,2);
-    MainWidget *widget4 = new MainWidget(60,3);
-
-    //Ajout des 4 widgets au grid Layout
-    mainLayout->addWidget(widget1,0,0);
-    mainLayout->addWidget(widget2,1,0);
-    mainLayout->addWidget(widget3,1,1);
-    mainLayout->addWidget(widget4,0,1);
 
    /* //Timer permettant de faire changer les saisons
 
@@ -98,8 +88,8 @@ int main(int argc, char *argv[])
     window->setLayout(mainLayout);
     window->showMaximized();*/ // <- Permet de mettre la fenetre en grand.
     QTimer *timer = new QTimer();
-    QObject::connect(timer, SIGNAL(timeout()), widget1, SLOT(seasonChange()));
-    timer->start(1000);
+    QObject::connect(timer, SIGNAL(timeout()), widget1, SLOT(Update()));
+    timer->start(1000.0f * 1.0f/60.0f);
 
     widget1->showMaximized();
 #else

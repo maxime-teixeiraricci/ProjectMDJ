@@ -37,12 +37,9 @@ bool BoxColliderComponent::Collide(BoxColliderComponent *collider)
 
 void BoxColliderComponent::Move(QVector3D moveVect)
 {
-    int precision = 10;
     QVector3D currentCenter = center;
     center += moveVect;
-    for (int k = 0 ; k < precision; k ++)
-    {
-        for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
+    for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
         {
             if (MainWidget::gameObjects.at(i) != gameObject &&
                     MainWidget::gameObjects.at(i)->collider != nullptr &&
@@ -52,13 +49,15 @@ void BoxColliderComponent::Move(QVector3D moveVect)
                 if ( Collide(bc) )
                 {
                     center = currentCenter;
+                    Move(
+                    0.95 * moveVect * QVector3D::dotProduct(moveVect.normalized(),
+                        (MainWidget::gameObjects.at(i)->transform->position - gameObject->transform->position).normalized()));
                     return;
                 }
             }
 
         }
-        gameObject->transform->position += moveVect / (1.0f * precision);
-    }
+        gameObject->transform->position += moveVect;
 
 }
 

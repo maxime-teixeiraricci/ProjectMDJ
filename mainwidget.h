@@ -70,6 +70,10 @@
 #include "inputmapping.h"
 #include "transform.h"
 #include "gravitycomponent.h"
+#include "QObject"
+#include "QDebug"
+#include "QtGamepad/QGamepad"
+#include "QtGamepad/QGamepadManager"
 
 class GeometryEngine;
 
@@ -87,11 +91,12 @@ public:
    static std::vector<GameObject *> gameObjects;
    QTime m_time;
    int m_frameCount;
-   void DrawMesh(GameObject *gameObject);
    static GameObject *playerObject;
+   static QVector3D startPosition;
 
 public slots:
      void seasonChange();
+     void Update();
 
 
 protected:

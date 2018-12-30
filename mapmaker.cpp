@@ -7,6 +7,7 @@
 #include "boxcollidercomponent.h"
 #include "switchcomponent.h"
 #include "colorblockcomponent.h"
+#include "invisibiltycomponent.h"
 
 #include <stdlib.h>
 
@@ -81,30 +82,36 @@ void  MapMaker::CreateLevel(QString mapfile)
 
                     if (c == 'H')
                     {
-                        m->Load("../ProjectMDJ/block.obj");
+                        m->Load("../ProjectMDJ/cube.obj");
                         m->LoadTexture("../ProjectMDJ/grass.png");
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
                     }
                     else if (c == 'W')
                     {
-                        m->Load("../ProjectMDJ/block.obj");
+                        m->Load("../ProjectMDJ/cube.obj");
                         m->LoadTexture("../ProjectMDJ/grass.png");
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
                     }
                     else if (c == 'X')
                     {
-                        m->Load("../ProjectMDJ/block.obj");
+                        m->Load("../ProjectMDJ/cube.obj");
                         m->LoadTexture("../ProjectMDJ/block.png");
                         gameObject->collider = bc;
-                        bc->size = QVector3D(1,1,1)*0.875f;
+                        bc->size = QVector3D(1,1,1)*0.98f;
 
                         bc->gameObject = gameObject;
                         GravityComponent *gc = new GravityComponent();
                         gc->gameObject = gameObject;
                         gameObject->components.push_back(gc);
-                        gameObject->transform->scale *= 0.875f;
+                        gameObject->transform->scale *= 0.98f;
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
                     }
                     else if (c == 'Q')
                     {
@@ -119,6 +126,8 @@ void  MapMaker::CreateLevel(QString mapfile)
                         bc->size = QVector3D(1,1,1)*0.75f;
                         bc->isTrigger = true;
                         gameObject->components.push_back(sc);
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
                     }
                     else if (c == 'Z')
                     {
@@ -133,13 +142,31 @@ void  MapMaker::CreateLevel(QString mapfile)
                         bc->size = QVector3D(1,1,1)*0.75f;
                         bc->isTrigger = true;
                         gameObject->components.push_back(sc);
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
                     }
                     else if (c == 'T')
                     {
-                        m->Load("../ProjectMDJ/block.obj");
+                        m->Load("../ProjectMDJ/cube.obj");
                         m->LoadTexture("../ProjectMDJ/mud.png");
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
+                    }
+                    else if (c == 'I')
+                    {
+                        m->Load("../ProjectMDJ/cloud.obj");
+                        m->LoadTexture("../ProjectMDJ/white.png");
+
+                        InvisibiltyComponent *ic = new InvisibiltyComponent();
+                        ic->gameObject = gameObject;
+                        gameObject->components.push_back(ic);
+
+                        gameObject->collider = bc;
+                        bc->gameObject = gameObject;
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
                     }
                     else if (c == '1')
                     {
@@ -164,6 +191,8 @@ void  MapMaker::CreateLevel(QString mapfile)
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
                         bc->isTrigger= true;
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
                     }
                     else if (c == '2')
                     {
@@ -188,6 +217,8 @@ void  MapMaker::CreateLevel(QString mapfile)
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
                         bc->isTrigger= true;
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
                     }
                     else if (c == 'C')
                     {
@@ -202,14 +233,20 @@ void  MapMaker::CreateLevel(QString mapfile)
                         StarCollectComponent *scc = new StarCollectComponent();
                         scc->gameObject = gameObject;
                         gameObject->components.push_back(scc);
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
+                    }
+                    else if (c == 'P')
+                    {
+                        MainWidget::startPosition = QVector3D(x*2, y*2, Z*2);
+
                     }
                     else {
                         std::cout << c << " letter not known ! " << std::endl;
-                        break;
+
                     }
 
-                    (MainWidget::gameObjects).push_back(gameObject);
-                    m->Compute(gameObject->transform);
+
                 }
 
 
