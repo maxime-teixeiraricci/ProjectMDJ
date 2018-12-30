@@ -18,7 +18,8 @@ SOURCES += main.cpp \
     gravitycomponent.cpp \
     boxcollidercomponent.cpp \
     collidercomponent.cpp \
-    rotationcomponent.cpp
+    rotationcomponent.cpp \
+    starcollectcomponent.cpp
 
 SOURCES += \
     mainwidget.cpp
@@ -38,7 +39,8 @@ HEADERS += \
     gravitycomponent.h \
     boxcollidercomponent.h \
     collidercomponent.h \
-    rotationcomponent.h
+    rotationcomponent.h \
+    starcollectcomponent.h
 
 RESOURCES += \
     shaders.qrc \

@@ -23,6 +23,7 @@ public:
     QVector3D position;
     QVector3D scale;
     QQuaternion rotation;
+    QVector3D eulerAngle;
 
     void getMatrix();
     void Rotate();

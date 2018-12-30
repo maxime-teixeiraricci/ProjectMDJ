@@ -58,6 +58,8 @@
 #include "boxcollidercomponent.h"
 
 double MainWidget::deltaTime = 0;
+GameObject* MainWidget::playerObject = nullptr;
+std::vector<GameObject *> MainWidget::gameObjects;
 
 MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     QOpenGLWidget(parent),
@@ -177,71 +179,6 @@ void MainWidget::initializeGL()
 //! [2]
 
 
-/*
-    // Use QBasicTimer because its faster than QTimer
-   timer.start(timeFrequence, this);
-   Mesh3D *m1 = new Mesh3D();
-   Mesh3D *m2 = new Mesh3D();
-   Mesh3D *m3 = new Mesh3D();
-   Mesh3D *m4 = new Mesh3D();
-   Mesh3D *m5 = new Mesh3D();
-   m1->Load("../ProjectMDJ/cube.obj");
-   m2->Load("../ProjectMDJ/block.obj");
-   m3->Load("../ProjectMDJ/skybox.obj");
-   // Test LOD :
-   m4->Load("../ProjectMDJ/block.obj");
-   m5->Load("../ProjectMDJ/block.obj");
-   //
-
-
-   //
-   m3->texture = new QOpenGLTexture(QImage(":/Daylight Box UV.png").mirrored());
-
-   gravity.gravity = QVector3D(0,0,-0.25f);
-   GameObject *G1 = new GameObject(m1);
-
-  G1->transform->SetScale(QVector3D(5,5,5));
-  m1->LoadTexture("../ProjectMDJ/mud.png");
-  m4->LoadTexture("../ProjectMDJ/grass.png");
-  m5->LoadTexture("../ProjectMDJ/PlayerTexture.png");
-  unsigned int index =0;
-
-  int col = 9;
-  int lin = 9;
-
-  for (int i = 0 ; i < lin * col ; i ++)
-  {
-      if ((i%lin) == 0 || (i%lin) == lin - 1 || (i/lin) == 0 || (i/lin) == col - 1)
-      {
-      gameObjects.push_back(new GameObject(m1));
-      //gameObjects[index]->SetScale(QVector3D(0.5,0.5,0.5));
-      float X = ((i%lin) - (lin/2))*2.0f;
-      float Y = ((i/lin) - (lin/2))*2.0f;
-      gameObjects[index++]->SetPosition(QVector3D(X, Y, -3));
-      }
-  }
-
-
-  for (int i = 0 ; i < lin * col ; i ++)
-  {
-      gameObjects.push_back(new GameObject(m4));
-      //gameObjects[index]->SetScale(QVector3D(0.5,0.5,0.5));
-      float X = ((i%lin) - (lin/2))*2.0f;
-      float Y = ((i/lin) - (lin/2))*2.0f;
-      gameObjects[index++]->SetPosition(QVector3D(X, Y, -1));
-  }
-
-  m2->LoadTexture("../ProjectMDJ/wood.png");
-  gameObjects.push_back(new GameObject(m2));
-  gameObjects[gameObjects.size() - 1]->SetScale(QVector3D((lin/2)+1,(col/2)+1,0.5));
-  gameObjects[gameObjects.size() - 1]->SetPosition(QVector3D(0, 0, -4.5));
-
-   // gameObjects.push_back(G1);
-
-
-   //gameObjects.push_back(G2);
-   //gameObjects.push_back(G4);*/
-
     PlayerComponent *pc = new PlayerComponent();
     Mesh3D *m5 = new Mesh3D();
     m5->Load("../ProjectMDJ/block.obj");
@@ -256,13 +193,13 @@ void MainWidget::initializeGL()
     gc->gameObject = playerObject;
     playerObject->components.push_back(gc);
 
-    playerObject->transform->position = QVector3D(0, 0, 12);
+    playerObject->transform->position = QVector3D(0, 0, 15);
     MapMaker mapMaker;
 
 
     // Creation du niveau
-    mapMaker.CreateLevel("../ProjectMDJ/level02.txt", &gameObjects);
-
+    mapMaker.CreateLevel("../ProjectMDJ/level02.txt");
+/*
     for (unsigned int i = 0 ; i < gameObjects.size(); i ++)
     {
         BoxColliderComponent *bc = new BoxColliderComponent();
@@ -274,11 +211,13 @@ void MainWidget::initializeGL()
         gameObjects[i]->collider = bc;
         bc->gameObject = gameObjects[i];
     }
+*/
+
 
     BoxColliderComponent *bc = new BoxColliderComponent();
     bc->size = QVector3D(1,1,1)*0.875f;
     playerObject->transform->scale *= 0.875f;
-    bc->gameObjects = &gameObjects;
+    //bc->gameObjects = &gameObjects;
     bc->center = playerObject->transform->position;
     playerObject->collider = bc;
     bc->gameObject = playerObject;
@@ -383,14 +322,14 @@ void MainWidget::paintGL()
     rotate += InputMapping::inputMap["CameraHorizontalAxis"] *0.25 ;
     applicationTime += (rotate - applicationTime) * 0.1;
 
-    heightCamera += InputMapping::inputMap["CameraVerticalAxis"];
+    heightCamera += InputMapping::inputMap["CameraVerticalAxis"] * -GravityComponent::GetDirection() ;
     posCamera = QVector3D(25*sin(applicationTime),-25*cos(applicationTime),heightCamera);
     targetCamera += (playerObject->transform->position - targetCamera) *0.05f;
 
 
     matrix.lookAt(posCamera, // Eye
                   targetCamera, // Center
-                  QVector3D(0,0,1)); // Normal
+                  QVector3D(0,0,1) * -GravityComponent::GetDirection()); // Normal
 
 
     Mesh3D::vectorCamera = (targetCamera - posCamera).normalized();
@@ -416,12 +355,19 @@ void MainWidget::paintGL()
     //playerObject->transform->position += QVector3D(InputMapping::inputMap["HorizontalAxis"], InputMapping::inputMap["VerticalAxis"],0);
     for (unsigned int i = 0; i < gameObjects.size(); i++)
     {
+
+        for (unsigned int j = 0; j < gameObjects[i]->components.size(); j++)
+        {
+
+            gameObjects[i]->components[j]->Do();
+        }
         gameObjects[i]->Draw(&program);
     }
 
-    if (playerObject->transform->position.z() < -3)
+    if (playerObject->transform->position.z() < -5 || playerObject->transform->position.z() > 20)
     {
-        playerObject->collider->Teleport(QVector3D(0,0,15));
+        playerObject->collider->Teleport(QVector3D(0,0,18));
+        if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
     }
 
     InputMapping::Reset();

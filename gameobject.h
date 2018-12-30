@@ -19,7 +19,6 @@ public:
     std::vector<GameObject*> getChildren();
     GameObject* getChild(int index);
     Mesh3D* getMesh();
-    QVector3D GetPosition();
 
     void setParent(GameObject* newParent);
     void setMesh(Mesh3D* newMesh);
@@ -27,18 +26,12 @@ public:
     void addChild(GameObject* newChild);
     void Draw(QOpenGLShaderProgram *program);
     void Draw(QOpenGLShaderProgram *program, Transform *transform);
-    void SetPosition(QVector3D newPosition);
-    void SetScale(QVector3D newScale);
-    void SetRotation(QQuaternion newRotation);
 
-    int test;
-    QVector3D position;
-    QVector3D scale;
-    QVector4D rotation;
     Mesh3D *mesh;
     Transform *transform;
     std::vector<Component *> components;
-    ColliderComponent *collider;
+    ColliderComponent *collider = nullptr;
+    void Destroy();
 
 
 private:

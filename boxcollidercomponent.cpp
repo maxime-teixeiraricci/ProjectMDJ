@@ -37,15 +37,19 @@ void BoxColliderComponent::Move(QVector3D moveVect)
 
     QVector3D currentCenter = center;
     center += moveVect;
-    for (unsigned int i = 0; i < gameObjects->size(); i++)
+    for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
     {
-        BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (gameObjects->at(i)->collider);
-
-        if ( Collide(bc) )
+        if (MainWidget::gameObjects.at(i)->collider != nullptr)
         {
-            center = currentCenter;
-            return;
+            std::cout << "J : " << i << std::endl;
+            BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (MainWidget::gameObjects.at(i)->collider);
+            if ( Collide(bc) )
+            {
+                center = currentCenter;
+                return;
+            }
         }
+
     }
     //center = currentCenter;
     gameObject->transform->position += moveVect;
@@ -56,13 +60,17 @@ void BoxColliderComponent::Teleport(QVector3D pos)
 {
     QVector3D currentCenter = center;
     center = pos;
-    for (unsigned int i = 0; i < gameObjects->size(); i++)
+    for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
     {
-        BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (gameObjects->at(i)->collider);
-        if ( Collide(bc) )
+        if (MainWidget::gameObjects.at(i)->collider != nullptr)
         {
-            center = currentCenter;
-            return;
+            std::cout << "J : " << i << std::endl;
+            BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (MainWidget::gameObjects.at(i)->collider);
+            if ( Collide(bc) )
+            {
+                center = currentCenter;
+                return;
+            }
         }
     }
     //center = currentCenter;

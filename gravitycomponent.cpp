@@ -9,9 +9,11 @@ GravityComponent::GravityComponent()
 
 void GravityComponent::Do()
 {
-    QVector3D v = GravityComponent::gravity * MainWidget::deltaTime;
+    QVector3D v = GravityComponent::gravity * MainWidget::deltaTime * 3;
     //std::cout << "[" << v.x() << ", " << v.y() << ", " << v.z() << "]" << std::endl;
     //gameObject->transform->position += QVector3D(0,0,0) * MainWidget::deltaTime ;
     gameObject->collider->Move(v);
 
 }
+
+

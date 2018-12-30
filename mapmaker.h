@@ -7,7 +7,7 @@ class MapMaker
 {
 public:
     MapMaker();
-    void CreateLevel(QString mapfile, std::vector<GameObject*> *resList);
+    void CreateLevel(QString mapfile);
 };
 
 #endif // MAPMAKER_H

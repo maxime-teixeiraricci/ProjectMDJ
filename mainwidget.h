@@ -84,11 +84,11 @@ public:
     int z = 0;
     int season = 0;
    std::vector<QOpenGLTexture *> textures;
-   std::vector<GameObject *> gameObjects;
+   static std::vector<GameObject *> gameObjects;
    QTime m_time;
    int m_frameCount;
    void DrawMesh(GameObject *gameObject);
-   GameObject *playerObject;
+   static GameObject *playerObject;
 
 public slots:
      void seasonChange();

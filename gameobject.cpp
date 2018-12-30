@@ -1,22 +1,16 @@
 #include "gameobject.h"
 #include <collider.h>
+#include "mainwidget.h"
 
 
 GameObject::GameObject(Mesh3D *newMesh)
 {
     mesh = newMesh;
-    this->position = QVector3D(0,0,0);
-    this->scale = QVector3D(1,1,1);
-    this->rotation = QVector4D(0,0,0,1);
     transform = new Transform();
 }
 
 GameObject::GameObject(Mesh3D *newMesh, GameObject* parent)
 {
-    //mesh = newMesh;
-    position = QVector3D(0,0,0);
-    scale = QVector3D(1,1,1);
-    rotation = QVector4D(0,0,0,1);
     setParent(parent);
     transform = new Transform();
 }
@@ -66,6 +60,17 @@ void GameObject::addChild(GameObject* newChild)
     children.push_back(newChild);
 }
 
+void GameObject::Destroy()
+{
+    for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
+    {
+        if (MainWidget::gameObjects[i] == this)
+        {
+            MainWidget::gameObjects.erase(MainWidget::gameObjects.begin()+i);
+            return;
+        }
+    }
+}
 
 void GameObject::Draw(QOpenGLShaderProgram *program)
 {
@@ -75,24 +80,4 @@ void GameObject::Draw(QOpenGLShaderProgram *program)
 void GameObject::Draw(QOpenGLShaderProgram *program, Transform *transform)
 {
     mesh->Draw(program, transform);
-}
-
-void GameObject::SetPosition(QVector3D newPosition)
-{
-    transform->SetPosition(newPosition);
-}
-
-void GameObject::SetScale(QVector3D newScale)
-{
-    transform->SetScale(newScale);
-}
-
-void GameObject::SetRotation(QQuaternion newRotation)
-{
-    transform->SetRotation(newRotation);
-}
-
-QVector3D GameObject::GetPosition()
-{
-    return position;
 }

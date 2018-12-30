@@ -19,7 +19,7 @@ Transform::Transform()
 
 void Transform::Rotate()
 {
-    transformMatrix.rotate(rotation);
+    transformMatrix.rotate(rotation.normalized());
 }
 
 void Transform::Translate()
@@ -35,9 +35,10 @@ void Transform::Scale()
 void Transform::getMatrix()
 {
     transformMatrix =  QMatrix4x4();
-    Rotate();
+
     Translate();
     Scale();
+    Rotate();
 }
 
 void Transform::SetPosition(QVector3D vector)

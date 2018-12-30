@@ -10,7 +10,7 @@ QVector3D Mesh3D::vectorCamera = QVector3D(0,0,0);
 
 Mesh3D::Mesh3D()
 {
-   /*verticePosition ={};
+    /*verticePosition ={};
     texturePosition={};
     normals={};
 
@@ -281,8 +281,8 @@ void Mesh3D::KDopCompute()
     MeshIdentity *mesh = meshesLOD[lodIndex];
     /* {1,1,0},	{-1,1,0},{1,-1,0},{-1,-1,0},{1,	0,1},{-1,0,1},{1,0,-1},{-1,0,-1},{0,1,1},{0,-1,1},{0,1,-1},{0,-1,-1} */
     std::vector<QVector3D> axis = {QVector3D(1,1,0),QVector3D(-1,1,0),QVector3D(1,-1,0),QVector3D(-1,-1,0),
-                                  QVector3D(1,0,1),QVector3D(-1,0,1),QVector3D(1,0,-1),QVector3D(-1,0,-1),
-                                  QVector3D(0,1,1),QVector3D(0,-1,1),QVector3D(0,1,-1),QVector3D(0,-1,-1)};
+                                   QVector3D(1,0,1),QVector3D(-1,0,1),QVector3D(1,0,-1),QVector3D(-1,0,-1),
+                                   QVector3D(0,1,1),QVector3D(0,-1,1),QVector3D(0,1,-1),QVector3D(0,-1,-1)};
 
     kdopMax = {};
     kdopMin = {};
@@ -326,23 +326,24 @@ void Mesh3D::Compute(Transform *transform)
     outIndexData = {};
     for( unsigned int i=0; i < mesh->trianglesIndex.size(); i+=3 )
     {
+        QMatrix4x4 rt = QMatrix4x4();
+        rt.rotate(transform->rotation.normalized());
 
-        if ( QVector3D::dotProduct(-vectCam, mesh->normals[mesh->normalsIndex[i]].normalized())> -0.5)
+        for(int m = 0; m < 3 ; m ++)
         {
-            for(int m = 0; m < 3 ; m ++)
-            {
-                int I = mesh->trianglesIndex[i+m];
-                int J = mesh->texturesIndex[i+m];
-                int K = mesh->normalsIndex[i+m];
-               transform->getMatrix();
-               QVector3D vertex = transform->transformMatrix * mesh->verticePosition[ I ];
-               QVector2D texture = mesh->texturePosition[ J ];
-               QVector3D normal = mesh->normals[K];
-               QVector3D colorTexture = QVector3D(color.red() /255.0f, color.green()/255.0f, color.blue()/255.0f);
-               outVertexData.push_back( {vertex, texture,normal,colorTexture});
-               outIndexData.push_back(index++);
-            }
+            int I = mesh->trianglesIndex[i+m];
+            int J = mesh->texturesIndex[i+m];
+            int K = mesh->normalsIndex[i+m];
+            transform->getMatrix();
+            QVector3D vertex = transform->transformMatrix * mesh->verticePosition[ I ];
+            QVector2D texture = mesh->texturePosition[ J ];
+
+            QVector3D normal = rt * mesh->normals[K];
+            QVector3D colorTexture = QVector3D(color.red() /255.0f, color.green()/255.0f, color.blue()/255.0f);
+            outVertexData.push_back( {vertex, texture,normal,colorTexture});
+            outIndexData.push_back(index++);
         }
+
 
 
     }
