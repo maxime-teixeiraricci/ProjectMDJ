@@ -93,6 +93,8 @@ public:
    int m_frameCount;
    static GameObject *playerObject;
    static QVector3D startPosition;
+   int frameNumber;
+   float deltaTimeFPS;
 
 public slots:
      void seasonChange();
@@ -100,8 +102,10 @@ public slots:
 
 
 protected:
-    bool event(QEvent *event) override;
+    //bool event(QEvent *event) override;
     void timerEvent(QTimerEvent *e) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;

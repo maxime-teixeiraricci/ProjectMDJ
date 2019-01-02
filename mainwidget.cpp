@@ -88,76 +88,99 @@ MainWidget::~MainWidget()
     doneCurrent();
 }
 
-bool MainWidget::event(QEvent *event)
+void MainWidget::keyPressEvent(QKeyEvent *event)
 {
-    //inputMapping->reset();
-
-    if (QGamepadManager::instance()->connectedGamepads().size() > 0 )
+    if (event->key() == Qt::Key_Z)
     {
-        QGamepad *gamepad = new QGamepad(0);
-        if (gamepad->buttonStart())
-        {
-            GravityComponent::gravity *= -1;
-        }
+        InputMapping::inputMap["HorizontalAxis"] = 1.0;
+    }
+    else if (event->key() == Qt::Key_S)
+    {
+        InputMapping::inputMap["HorizontalAxis"] = -1.0;
+    }
+    if (event->key() == Qt::Key_D)
+    {
+        InputMapping::inputMap["VerticalAxis"] = 1.0;
+    }
+    else if (event->key() == Qt::Key_Q)
+    {
+        InputMapping::inputMap["VerticalAxis"] = -1.0;
     }
 
-    if (event->type() == QEvent::KeyPress)
+    if (event->key() == Qt::Key_Left)
     {
-        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
-        if (ke->key() == Qt::Key_Z)
-        {
-            InputMapping::inputMap["HorizontalAxis"] = 1.0;
-        }
-        else if (ke->key() == Qt::Key_S)
-        {
-            InputMapping::inputMap["HorizontalAxis"] = -1.0;
-        }
-
-        if (ke->key() == Qt::Key_D)
-        {
-            InputMapping::inputMap["VerticalAxis"] = 1.0;
-        }
-        else if (ke->key() == Qt::Key_Q)
-        {
-            InputMapping::inputMap["VerticalAxis"] = -1.0;
-        }
-
-        if (ke->key() == Qt::Key_Left)
-        {
-            InputMapping::inputMap["CameraHorizontalAxis"] = -1.0;
-        }
-        else if (ke->key() == Qt::Key_Right)
-        {
-            InputMapping::inputMap["CameraHorizontalAxis"] = 1.0;
-        }
-
-        if (ke->key() == Qt::Key_Down)
-        {
-            InputMapping::inputMap["CameraVerticalAxis"] = -1.0;
-        }
-        else if (ke->key() == Qt::Key_Up)
-        {
-            InputMapping::inputMap["CameraVerticalAxis"] = 1.0;
-        }
-
-        if (ke->key() == Qt::Key_Space)
-        {
-            GravityComponent::gravity *= -1;
-        }
-
-        return true;
-    } else if (event->type() == QEvent::MouseMove) {
-        /*QMouseEvent *mouse = static_cast<QMouseEvent *>(event);
-        inputMapping->inputMap["axisHori"] = mouse->x()/(width()*1.0);
-        inputMapping->inputMap["axisVerti"] = mouse->y()/(height()*1.0);
-        inputMapping->printMap();
-        return true;*/
+        InputMapping::inputMap["CameraHorizontalAxis"] = -1.0;
+    }
+    else if (event->key() == Qt::Key_Right)
+    {
+        InputMapping::inputMap["CameraHorizontalAxis"] = 1.0;
     }
 
-    return QWidget::event(event);
+    if (event->key() == Qt::Key_Down)
+    {
+        InputMapping::inputMap["CameraVerticalAxis"] = -1.0;
+    }
+    else if (event->key() == Qt::Key_Up)
+    {
+        InputMapping::inputMap["CameraVerticalAxis"] = 1.0;
+    }
+
+    if (event->key() == Qt::Key_Space)
+    {
+        GravityComponent::gravity *= -1;
+    }
+
+
+    QWidget::keyPressEvent(event);
 }
 
 
+
+
+
+void MainWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Z)
+    {
+        InputMapping::inputMap["HorizontalAxis"] = 0.0;
+    }
+    else if (event->key() == Qt::Key_S)
+    {
+        InputMapping::inputMap["HorizontalAxis"] = 0.0;
+    }
+    if (event->key() == Qt::Key_D)
+    {
+        InputMapping::inputMap["VerticalAxis"] = 0.0;
+    }
+    else if (event->key() == Qt::Key_Q)
+    {
+        InputMapping::inputMap["VerticalAxis"] = 0.0;
+    }
+
+    if (event->key() == Qt::Key_Left)
+    {
+        InputMapping::inputMap["CameraHorizontalAxis"] = 0.0;
+    }
+    else if (event->key() == Qt::Key_Right)
+    {
+        InputMapping::inputMap["CameraHorizontalAxis"] = 0.0;
+    }
+
+    if (event->key() == Qt::Key_Down)
+    {
+        InputMapping::inputMap["CameraVerticalAxis"] = 0.0;
+    }
+    else if (event->key() == Qt::Key_Up)
+    {
+        InputMapping::inputMap["CameraVerticalAxis"] = 0.0;
+    }
+
+    if (event->key() == Qt::Key_Space)
+    {
+        GravityComponent::gravity *= 1;
+    }
+    QWidget::keyReleaseEvent(event);
+}
 
 void MainWidget::timerEvent(QTimerEvent *)
 {
@@ -201,7 +224,7 @@ void MainWidget::initializeGL()
 
 
     // Creation du niveau
-    mapMaker.CreateLevel("../ProjectMDJ/level02.txt");
+    mapMaker.CreateLevel("../ProjectMDJ/level01.txt");
     playerObject->transform->SetPosition(startPosition);
 /*
     for (unsigned int i = 0 ; i < gameObjects.size(); i ++)
@@ -337,10 +360,10 @@ void MainWidget::paintGL()
     }
 
 
-    InputMapping::Reset();
+    //InputMapping::Reset();
 
 
-    std::cout << "Paint Time : " << paintTime.elapsed() << "ms [" << 1.0/(paintTime.elapsed()/1000.0) <<"]"<< std::endl;
+    //std::cout << "Paint Time : " << paintTime.elapsed() << "ms [" << 1.0/(paintTime.elapsed()/1000.0) <<"]"<< std::endl;
     paintTime.restart();
     update();
 
@@ -348,20 +371,24 @@ void MainWidget::paintGL()
 
 void MainWidget::Update()
 {
+    MainWidget::deltaTime = m_time.elapsed() / 1000.0f;
+    deltaTimeFPS += deltaTime;
     m_time.restart();
 
     QTime updateTime = QTime();
     updateTime.start();
-    rotate += InputMapping::inputMap["CameraHorizontalAxis"] *0.25 ;
-    applicationTime += (rotate - applicationTime) * 0.1;
 
-    heightCamera += InputMapping::inputMap["CameraVerticalAxis"];
-    posCamera = QVector3D(25*sin(applicationTime),-25*cos(applicationTime),heightCamera);
-    targetCamera += (playerObject->transform->position * 0.5 - targetCamera) *0.05f;
+    applicationTime += InputMapping::inputMap["CameraHorizontalAxis"] *0.05 ;
+    heightCamera += InputMapping::inputMap["CameraVerticalAxis"] * 0.05;
+
+    posCamera = QVector3D(45*cos(applicationTime)*cos(heightCamera),
+                          45*sin(applicationTime)*cos(heightCamera),
+                          45*sin(heightCamera));
+
+    targetCamera += (playerObject->transform->position  - targetCamera) *0.5f;
 
     for (unsigned int i = 0; i < playerObject->components.size(); i++)
     {
-
         playerObject->components[i]->Do();
     }
     playerObject->mesh->Compute(playerObject->transform);
@@ -380,8 +407,15 @@ void MainWidget::Update()
         if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
     }
 
-    std::cout << "Update Time : " << updateTime.elapsed() << "ms [" << 1.0/(updateTime.elapsed()/1000.0) <<"]"<< std::endl;
+    //std::cout << "Update Time : " << updateTime.elapsed() << "ms [" << 1.0/(updateTime.elapsed()/1000.0) <<"]"<< std::endl;
     updateTime.restart();
-    MainWidget::deltaTime = m_time.elapsed() / 1000.0f;
+
+    //std::cout << "Update Time : " << MainWidget::deltaTime << "ms [FPS " << 1.0/MainWidget::deltaTime <<"]"<< std::endl;
+    frameNumber ++;
+    if (frameNumber % 50 == 0)
+    {
+        std::cout << "Update Time : " << deltaTimeFPS/50.0 << "ms [FPS " << 1.0/(deltaTimeFPS/50.0)<<"]"<< std::endl;
+        deltaTimeFPS = 0;
+    }
 
 }

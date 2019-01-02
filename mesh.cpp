@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QOpenGLFunctions>
 #include <QGenericMatrix>
+#include <QOpenGLExtraFunctions>
 
 
 
@@ -10,13 +11,6 @@ QVector3D Mesh3D::vectorCamera = QVector3D(0,0,0);
 
 Mesh3D::Mesh3D()
 {
-    /*verticePosition ={};
-    texturePosition={};
-    normals={};
-
-    trianglesIndex={};
-    texturesIndex={};
-    normalsIndex={};*/
     texture = new QOpenGLTexture(QImage(":/PaletteTest.png").mirrored());
     color = QColor(255,255,255);
     lodIndex = 0;
@@ -206,70 +200,6 @@ void Mesh3D::Scale(double scale)
     }
 }
 
-/*
-void Mesh3D::Draw(QOpenGLShaderProgram *program, QVector3D relativePosition)
-{
-    MeshIdentity *mesh = meshesLOD[lodIndex];
-    int j =0;
-    std::vector<VertexData> outVertexData;
-    std::vector<GLushort> outIndexData;
-    for( unsigned int i=0; i < mesh->trianglesIndex.size(); i++ )
-    {
-
-        int I = mesh->trianglesIndex[i];
-        int J = mesh->texturesIndex[i];
-        int K = mesh->normalsIndex[i];
-       QVector3D vertex = mesh->verticePosition[ I ]+relativePosition;
-       QVector2D texture = mesh->texturePosition[ J ];
-       QVector3D normal = mesh->normals[K];
-       QVector3D colorTexture = QVector3D(color.red() /255.0f, color.green()/255.0f, color.blue()/255.0f);
-       outVertexData.push_back( {vertex, texture,normal,colorTexture});
-       outIndexData.push_back(i);
-
-
-    }
-    QOpenGLBuffer arrayBuf;
-    QOpenGLBuffer indexBuf(QOpenGLBuffer::IndexBuffer);
-    initializeOpenGLFunctions();
-    arrayBuf.create();
-    indexBuf.create();
-
-    arrayBuf.bind();
-    arrayBuf.allocate(outVertexData.data(), outVertexData.size() * sizeof(VertexData));
-
-    // Transfer index data to VBO 1
-    indexBuf.bind();
-    indexBuf.allocate(outIndexData.data(), outIndexData.size() * sizeof(GLushort));
-
-    quintptr offset = 0;
-    //program->setAttributeValue(program->attributeLocation("snow"), snow);
-    int vertexLocation = program->attributeLocation("a_position");
-    program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    offset += sizeof(QVector3D);
-
-    int texcoordLocation = program->attributeLocation("a_texcoord");
-    program->enableAttributeArray(texcoordLocation);
-    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-
-    offset += sizeof(QVector2D);
-
-    int normalLocation = program->attributeLocation("a_normal");
-    program->enableAttributeArray(normalLocation);
-    program->setAttributeBuffer(normalLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-    //meshes[m].texture->bind();
-
-    offset += sizeof(QVector3D);
-
-    int colorLocation = program->attributeLocation("a_color");
-    program->enableAttributeArray(colorLocation);
-    program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-    texture->bind();
-
-    glDrawElements(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr);
-}
-*/
 
 void Mesh3D::StaticLoad(const QString fileName)
 {
@@ -390,8 +320,9 @@ void Mesh3D::Draw(QOpenGLShaderProgram *program, Transform *transform)
     program->enableAttributeArray(colorLocation);
     program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
     texture->bind();
-    //glDrawElementsInstanced()
-    glDrawElements(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr);
+    glDrawElementsInstanced(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr,1);
+    //glDrawElementsInstanced(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr,1);
+    //glDrawElements(GL_TRIANGLES, outIndexData.size(), GL_UNSIGNED_SHORT, nullptr);
 }
 
 

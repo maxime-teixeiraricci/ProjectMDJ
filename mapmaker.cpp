@@ -23,6 +23,8 @@ void  MapMaker::CreateLevel(QString mapfile)
     QFile file(mapfile);
     file.open(QFile::ReadOnly);
 
+    QOpenGLTexture *texture = new QOpenGLTexture(QImage("../ProjectMDJ/grass.png").mirrored());
+
     if( file.exists() == NULL )
     {
         std::cout<<"Impossible to open the file ! " << std::endl;
@@ -82,8 +84,9 @@ void  MapMaker::CreateLevel(QString mapfile)
 
                     if (c == 'H')
                     {
-                        m->Load("../ProjectMDJ/cube.obj");
-                        m->LoadTexture("../ProjectMDJ/grass.png");
+                        m->Load("../ProjectMDJ/block.obj");
+                        m->texture = texture;
+                        //m->LoadTexture("../ProjectMDJ/grass.png");
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
                         (MainWidget::gameObjects).push_back(gameObject);
@@ -91,8 +94,9 @@ void  MapMaker::CreateLevel(QString mapfile)
                     }
                     else if (c == 'W')
                     {
-                        m->Load("../ProjectMDJ/cube.obj");
-                        m->LoadTexture("../ProjectMDJ/grass.png");
+                        m->Load("../ProjectMDJ/block.obj");
+                        m->texture = texture;
+                        //m->LoadTexture("../ProjectMDJ/grass.png");
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
                         (MainWidget::gameObjects).push_back(gameObject);
@@ -100,8 +104,9 @@ void  MapMaker::CreateLevel(QString mapfile)
                     }
                     else if (c == 'X')
                     {
-                        m->Load("../ProjectMDJ/cube.obj");
-                        m->LoadTexture("../ProjectMDJ/block.png");
+                        m->Load("../ProjectMDJ/block.obj");
+                        m->texture = texture;
+                        //m->LoadTexture("../ProjectMDJ/block.png");
                         gameObject->collider = bc;
                         bc->size = QVector3D(1,1,1)*0.98f;
 
@@ -113,6 +118,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                         (MainWidget::gameObjects).push_back(gameObject);
                         m->Compute(gameObject->transform);
                     }
+
                     else if (c == 'Q')
                     {
                         m->Load("../ProjectMDJ/switchUp.obj");
@@ -147,7 +153,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                     }
                     else if (c == 'T')
                     {
-                        m->Load("../ProjectMDJ/cube.obj");
+                        m->Load("../ProjectMDJ/block.obj");
                         m->LoadTexture("../ProjectMDJ/mud.png");
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
@@ -214,6 +220,8 @@ void  MapMaker::CreateLevel(QString mapfile)
                         cbc->gameObject = gameObject;
                         cbc->startState = true;
 
+
+
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
                         bc->isTrigger= true;
@@ -229,6 +237,27 @@ void  MapMaker::CreateLevel(QString mapfile)
                         RotationComponent *rc = new RotationComponent();
                         rc->gameObject = gameObject;
                         gameObject->components.push_back(rc);
+
+                        StarCollectComponent *scc = new StarCollectComponent();
+                        scc->gameObject = gameObject;
+                        gameObject->components.push_back(scc);
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        m->Compute(gameObject->transform);
+                    }
+                    else if (c == 'c')
+                    {
+                        m->Load("../ProjectMDJ/star.obj");
+                        m->LoadTexture("../ProjectMDJ/gold.png");
+
+                        gameObject->transform->eulerAngle = QVector3D(0,0,rand() * 50);
+                        RotationComponent *rc = new RotationComponent();
+                        rc->gameObject = gameObject;
+                        gameObject->components.push_back(rc);
+
+
+                        InvisibiltyComponent *ic = new InvisibiltyComponent();
+                        ic->gameObject = gameObject;
+                        gameObject->components.push_back(ic);
 
                         StarCollectComponent *scc = new StarCollectComponent();
                         scc->gameObject = gameObject;

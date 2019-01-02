@@ -15,6 +15,7 @@ void main()
     float a = (dot(normalize(vec4(0,2,1,0)),normalize(v_normal))+1.0)*0.5;
     //a = 0.0;
     fragColor = texture2D(texture, v_texcoord)*a*v_color*gl_FragCoord.z;
+    //fragColor = vec4(vec3(gl_FragCoord.z), 1.0);
     //v_fragmentdepth = gl_FragCoord.z;
 }
 //! [0]

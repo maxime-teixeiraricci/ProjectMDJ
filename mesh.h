@@ -8,6 +8,8 @@
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLBuffer>
 #include <QOpenGLFunctions>
+#include <QOpenGLFunctions_4_4_Core>
+
 #include "transform.h"
 //#include <collider.h>
 
@@ -34,7 +36,7 @@ struct VertexData
     QVector3D color;
 };
 
-class Mesh3D : protected QOpenGLFunctions
+class Mesh3D : protected QOpenGLExtraFunctions
 {
 public:
     Mesh3D();
