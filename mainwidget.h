@@ -95,6 +95,7 @@ public:
    static QVector3D startPosition;
    int frameNumber;
    float deltaTimeFPS;
+   void Joypad();
 
 public slots:
      void seasonChange();
@@ -143,6 +144,7 @@ private:
     double applicationTime;
     double heightCamera;
     double timeFrequence;
+    double radiusCamera;
 
 };
 

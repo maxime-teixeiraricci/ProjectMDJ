@@ -57,6 +57,7 @@
 #include "mapmaker.h"
 #include "boxcollidercomponent.h"
 #include "QtGamepad/QGamepadManager"
+#include "meshrenderer.h"
 
 double MainWidget::deltaTime = 0;
 GameObject* MainWidget::playerObject = nullptr;
@@ -77,6 +78,7 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     rotate = 0;
     heightCamera = 25;
     MainWidget::deltaTime = 0;
+    radiusCamera = 45;
 }
 
 MainWidget::~MainWidget()
@@ -130,13 +132,18 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
         GravityComponent::gravity *= -1;
     }
 
+    if (event->key() == Qt::Key_Minus)
+    {
+        radiusCamera -= 0.5f;
+    }
+    else if (event->key() == Qt::Key_Plus)
+    {
+        radiusCamera += 0.5f;
+    }
+
 
     QWidget::keyPressEvent(event);
 }
-
-
-
-
 
 void MainWidget::keyReleaseEvent(QKeyEvent *event)
 {
@@ -179,12 +186,14 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
     {
         GravityComponent::gravity *= 1;
     }
+
+
+
     QWidget::keyReleaseEvent(event);
 }
 
 void MainWidget::timerEvent(QTimerEvent *)
 {
-
     update();
 }
 
@@ -203,28 +212,35 @@ void MainWidget::initializeGL()
 
     // Enable back face culling
     glEnable( GL_FRONT);
+
 //! [2]
 
+    // Creation du niveau
+    MapMaker mapMaker;
+    mapMaker.CreateLevel("../ProjectMDJ/level01.txt");
+    //
 
-    PlayerComponent *pc = new PlayerComponent();
+    Mesh3D *m3 = new Mesh3D();
+    m3->Load("../ProjectMDJ/skybox.obj");
+    m3->LoadTexture(":/Daylight Box UV.png");
+    m3->Compute();
+
+    // PLAYER
+    playerObject = new GameObject();
+
     Mesh3D *m5 = new Mesh3D();
     m5->Load("../ProjectMDJ/block.obj");
     m5->LoadTexture("../ProjectMDJ/PlayerTexture.png");
-
-    playerObject = new GameObject(m5);
-
+    playerObject->meshId = MeshRenderer::instance->meshes.size();
+    m5->Compute();
+    MeshRenderer::instance->meshes.push_back(m5);
+    PlayerComponent *pc = new PlayerComponent();
     pc->gameObject = playerObject;
     playerObject->components.push_back(pc);
-
     GravityComponent *gc = new GravityComponent();
     gc->gameObject = playerObject;
     playerObject->components.push_back(gc);
-
-    MapMaker mapMaker;
-
-
-    // Creation du niveau
-    mapMaker.CreateLevel("../ProjectMDJ/level01.txt");
+    gameObjects.push_back(playerObject);
     playerObject->transform->SetPosition(startPosition);
 /*
     for (unsigned int i = 0 ; i < gameObjects.size(); i ++)
@@ -247,17 +263,30 @@ void MainWidget::initializeGL()
     //bc->gameObjects = &gameObjects;
     bc->center = playerObject->transform->position;
     playerObject->collider = bc;
+
+
     bc->gameObject = playerObject;
 
-    Mesh3D *m3 = new Mesh3D();
-    m3->Load("../ProjectMDJ/skybox.obj");
-    m3->texture = new QOpenGLTexture(QImage(":/Daylight Box UV.png").mirrored());
-    skybox = new GameObject(m3);
+    skybox = new GameObject();
     skybox->transform->scale *= 3;
-    m3->Compute(skybox->transform);
+    skybox->meshId = MeshRenderer::instance->meshes.size();
+    MeshRenderer::instance->meshes.push_back(m3);
+    //gameObjects.push_back(playerObject);
+
+
+
+
+    //MeshRenderer::instance->meshes.push_back(m5);
+
+    gameObjects.push_back(skybox);
+    MeshRenderer::instance->ComputeGameObject();
+    //MeshRenderer::instance->transitions[skybox->meshId].push_back(skybox->transform->transformMatrix);
+    //MeshRenderer::instance->transitions[playerObject->meshId].push_back(playerObject->transform->transformMatrix);
+
+    MeshRenderer::instance->Init(&program);
+
     m_time.start();
 }
-
 
 void MainWidget::seasonChange()
 {
@@ -319,6 +348,12 @@ void MainWidget::initTextures()
 }
 //! [4]
 
+void MainWidget::Joypad()
+{
+
+}
+
+
 //! [5]
 void MainWidget::resizeGL(int w, int h)
 {
@@ -326,7 +361,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 500.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 1000.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -341,7 +376,7 @@ void MainWidget::paintGL()
     QTime paintTime = QTime();
     paintTime.start();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    texture->bind();
+    //texture->bind();
 
 
     QMatrix4x4 matrix;
@@ -352,19 +387,34 @@ void MainWidget::paintGL()
     program.setUniformValue("mvp_matrix", projection * matrix);
     // Use texture unit 0 which contains cube.png
     program.setUniformValue("texture", 0);
-    skybox->Draw(&program);
-    playerObject->Draw(&program);
+    //skybox->Draw(&program);
+    //MeshRenderer::instance->DrawSingle(playerObject);
+
+
+    /*playerObject->Draw(&program);
     for (unsigned int i = 0; i < gameObjects.size(); i++)
     {
-        if (gameObjects[i]->mesh->isDrawable) gameObjects[i]->Draw(&program);
+        //if (gameObjects[i]->mesh->isDrawable) gameObjects[i]->Draw(&program);
     }
 
-
     //InputMapping::Reset();
-
-
     //std::cout << "Paint Time : " << paintTime.elapsed() << "ms [" << 1.0/(paintTime.elapsed()/1000.0) <<"]"<< std::endl;
-    paintTime.restart();
+    paintTime.restart();*/
+    //MeshRenderer::instance->Init(&program);
+    //MeshRenderer::instance->ComputeGameObject();
+    //MeshRenderer::instance->Init(&program);
+
+    MeshRenderer::instance->ComputeGameObject();
+    MeshRenderer::instance->Draw(&program);
+
+
+
+    playerObject->transform->getMatrix();
+    MeshRenderer::instance->transitions[playerObject->meshId][0] = playerObject->transform->transformMatrix;
+
+
+    //qDebug() << "Player: " << playerObject->transform->transformMatrix;
+
     update();
 
 }
@@ -381,9 +431,10 @@ void MainWidget::Update()
     applicationTime += InputMapping::inputMap["CameraHorizontalAxis"] *0.05 ;
     heightCamera += InputMapping::inputMap["CameraVerticalAxis"] * 0.05;
 
-    posCamera = QVector3D(45*cos(applicationTime)*cos(heightCamera),
-                          45*sin(applicationTime)*cos(heightCamera),
-                          45*sin(heightCamera));
+    float radius = 45.0f;
+    posCamera = QVector3D(radiusCamera * cos(applicationTime)*cos(heightCamera),
+                          radiusCamera * sin(applicationTime)*cos(heightCamera),
+                          radiusCamera * sin(heightCamera));
 
     targetCamera += (playerObject->transform->position  - targetCamera) *0.5f;
 
@@ -391,7 +442,8 @@ void MainWidget::Update()
     {
         playerObject->components[i]->Do();
     }
-    playerObject->mesh->Compute(playerObject->transform);
+    //qDebug() <<"Player : " <<  playerObject->transform->position;
+    //playerObject->mesh->Compute(playerObject->transform);
     for (unsigned int i = 0; i < gameObjects.size(); i++)
     {
 

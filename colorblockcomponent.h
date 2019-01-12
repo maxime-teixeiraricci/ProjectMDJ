@@ -13,8 +13,6 @@ public:
     void Change();
     GameObject* gameObject;
     bool startState;
-
-    std::vector<Mesh3D *> meshes;
 };
 
 #endif // COLORBLOCKCOMPONENT_H

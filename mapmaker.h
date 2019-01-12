@@ -8,6 +8,7 @@ class MapMaker
 public:
     MapMaker();
     void CreateLevel(QString mapfile);
+    void InstantiateMesh();
 };
 
 #endif // MAPMAKER_H

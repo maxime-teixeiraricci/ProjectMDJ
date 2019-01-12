@@ -3,6 +3,12 @@
 #include "mainwidget.h"
 
 
+GameObject::GameObject()
+{
+
+    transform = new Transform();
+}
+
 GameObject::GameObject(Mesh3D *newMesh)
 {
     mesh = newMesh;

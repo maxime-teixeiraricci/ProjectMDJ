@@ -27,12 +27,13 @@ void SwitchComponent::ChangeColor()
 {
     if (SwitchComponent::activate^startState)
     {
+        gameObject->meshId = 6;
         //gameObject->mesh->LoadTexture("../ProjectMDJ/blackSwitch.png");
-        gameObject->mesh->color = QColor(50.0,50.0,50.0);
+        //gameObject->mesh->color = QColor(50.0,50.0,50.0);
     }
     else
     {
-        gameObject->mesh->color = QColor(255.0,255.0,255.0);
+        gameObject->meshId = 7;
+        //gameObject->mesh->color = QColor(255.0,255.0,255.0);
     }
-    gameObject->mesh->Compute(gameObject->transform);
 }

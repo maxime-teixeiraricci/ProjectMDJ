@@ -7,10 +7,12 @@
 #include "transform.h"
 #include "component.h"
 #include "collidercomponent.h"
+#include "QColor"
 
 class GameObject
 {
 public:
+    GameObject();
     GameObject(Mesh3D *newMesh);
     GameObject(Mesh3D *newMesh, GameObject* parent);
 
@@ -32,6 +34,12 @@ public:
     std::vector<Component *> components;
     ColliderComponent *collider = nullptr;
     void Destroy();
+
+
+    int meshId = -1;
+    int meshInstanceId;
+    QColor color;
+    bool isDrawable = true;
 
 
 private:

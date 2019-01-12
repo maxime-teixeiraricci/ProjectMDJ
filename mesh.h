@@ -49,6 +49,7 @@ public:
     void Load(const QString fileName, int lodIndex);
     void LoadTexture(const QString fileName);
     void Compute(Transform *transform);
+    void Compute();
 
     QOpenGLTexture *texture;
 

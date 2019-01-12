@@ -10,5 +10,5 @@ void RotationComponent::Do()
 {
     gameObject->transform->eulerAngle += QVector3D(0,0,5);
     gameObject->transform->rotation = QQuaternion::fromEulerAngles(gameObject->transform->eulerAngle);
-    gameObject->mesh->Compute(gameObject->transform);
+    //gameObject->mesh->Compute(gameObject->transform);
 }

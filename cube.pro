@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     starcollectcomponent.cpp \
     switchcomponent.cpp \
     colorblockcomponent.cpp \
-    invisibiltycomponent.cpp
+    invisibiltycomponent.cpp \
+    meshrenderer.cpp
 
 SOURCES += \
     mainwidget.cpp
@@ -46,7 +47,8 @@ HEADERS += \
     starcollectcomponent.h \
     switchcomponent.h \
     colorblockcomponent.h \
-    invisibiltycomponent.h
+    invisibiltycomponent.h \
+    meshrenderer.h
 
 RESOURCES += \
     shaders.qrc \
