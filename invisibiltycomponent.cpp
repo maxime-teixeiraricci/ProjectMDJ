@@ -1,5 +1,6 @@
 #include "invisibiltycomponent.h"
 #include "mainwidget.h"
+#include "meshrenderer.h"
 InvisibiltyComponent::InvisibiltyComponent()
 {
 
@@ -15,4 +16,6 @@ void InvisibiltyComponent::Do()
     {
         gameObject->isDrawable = true;
     }
+    //if (gameObject->meshInstanceId>-1) MeshRenderer::instance->transitions[gameObject->meshId][gameObject->meshInstanceId] = gameObject->transform->transformMatrix;
+    MeshRenderer::instance->DrawSingle(gameObject);
 }

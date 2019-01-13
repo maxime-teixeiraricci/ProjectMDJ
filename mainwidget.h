@@ -93,9 +93,10 @@ public:
    int m_frameCount;
    static GameObject *playerObject;
    static QVector3D startPosition;
-   int frameNumber;
+   int frameNumber = 0;
    float deltaTimeFPS;
    void Joypad();
+   QGamepad *gamepad = nullptr;
 
 public slots:
      void seasonChange();

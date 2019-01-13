@@ -30,8 +30,15 @@ void main()
 
     // Pass texture coordinate to fragment shader
     // Value will be automatically interpolated to fragments inside polygon faces
+    mat4 rot = aOffset;
+
+    rot[3][0]=0;
+    rot[3][1]=0;
+    rot[3][2]=0;
+    rot[3][3]=1;
+
     v_texcoord =  aText;
-    v_normal = aNormal;// * aNormal;
+    v_normal = rot*aNormal;// * aNormal;
     v_color = aColor;
 }
 //! [0]

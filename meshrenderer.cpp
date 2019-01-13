@@ -9,21 +9,32 @@ MeshRenderer::MeshRenderer()
 
 void MeshRenderer::DrawSingle(GameObject *gameObject)
 {
+
     initializeOpenGLFunctions();
+
+    gameObject->transform->getMatrix();
     unsigned int i = gameObject->meshId;
+
+    if (gameObject->meshInstanceId < 0 || gameObject->meshInstanceId >=transitions[i].size()) return;
+
+
+
+    transitions[i][gameObject->meshInstanceId] = gameObject->transform->transformMatrix;
+
+
     int numberObjects = transitions[i].size();
-    if (numberObjects > 0)
+    if (numberObjects > -1)
     {
         Mesh3D *mesh = meshes[i];
-        // Buffer de translations
 
+        unsigned int instanceVBO = instanceVBOs[i];
 
+/*
         int stride = sizeof(VertexData);
         unsigned int vertexVBO=vertexVBOs[i];
         unsigned int VAO = VAOs[i];
         unsigned int instanceVBO = instanceVBOs[i];
 
-        //glDeleteBuffers(1, &vertexVBO);
         //glGenBuffers(1, &vertexVBO);
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
@@ -41,15 +52,14 @@ void MeshRenderer::DrawSingle(GameObject *gameObject)
         glEnableVertexAttribArray(3);
         glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)(2*sizeof(QVector3D)+sizeof(QVector2D)));
         glBindBuffer(GL_ARRAY_BUFFER, 0);  // CLOSE VBO
-
+*/
         // Buffer de Matrix
         //unsigned int instanceVBO;
-        //glDeleteBuffers(1, &instanceVBO);
         //glGenBuffers(1, &instanceVBO);
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(QMatrix4x4) * numberObjects, &transitions[i][0], GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+/*
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
         glEnableVertexAttribArray(4);
         glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(QMatrix4x4), (void*)0);
@@ -67,16 +77,15 @@ void MeshRenderer::DrawSingle(GameObject *gameObject)
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+
         unsigned int EBO = EBOs[i];
-        //glDeleteBuffers(1, &EBO);
         //glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(VertexData) * mesh->outVertexData.size(), mesh->outVertexData.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+*/
 
     }
-
-
 }
 
 void MeshRenderer::Draw(QOpenGLShaderProgram *program)
@@ -85,6 +94,7 @@ void MeshRenderer::Draw(QOpenGLShaderProgram *program)
 
     for (unsigned int i = 0; i < transitions.size(); i++)
     {
+
         int numberObjects = transitions[i].size();
         if (numberObjects > 0)
         {
@@ -116,11 +126,20 @@ void MeshRenderer::Init(QOpenGLShaderProgram *program)
     glGenBuffers(transitions.size(), vertexVBOs);
     for (unsigned int i = 0; i < transitions.size(); i++)
     {
+        qDebug() << "Mesh: " << i << ": " << transitions[i].size();
         int numberObjects = transitions[i].size();
-        if (numberObjects > 0)
+        if (numberObjects > -1)
         {
             Mesh3D *mesh = meshes[i];
             // Buffer de translations
+            if (numberObjects == 0)
+            {
+                QMatrix4x4 mat;
+                mat.setToIdentity();
+                transitions[i] = {mat};
+                numberObjects = 1;
+            }
+
 
 
             int stride = sizeof(VertexData);
@@ -195,15 +214,24 @@ void MeshRenderer::ComputeGameObject()
     for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
     {
         GameObject *gameObject = MainWidget::gameObjects.at(i);
-        gameObject->transform->getMatrix();
+
         /*qDebug() << "GameObjects : " << i << " MeshID: " << gameObject->meshId;
         qDebug() << gameObject->transform->transformMatrix;*/
+        gameObject->meshInstanceId = -1;
         if (gameObject->meshId >= 0 && gameObject->meshId < meshes.size() && gameObject->isDrawable)
         {
-
+            gameObject->transform->getMatrix();
+            gameObject->meshInstanceId = transitions[gameObject->meshId].size();
+            if (gameObject->meshId == 9)
+            {
+                //qDebug() << "Mesh : " << gameObject->meshId << "  ID : "<< gameObject->meshInstanceId << " " << gameObject->transform->position;
+            }
             transitions[gameObject->meshId].push_back(gameObject->transform->transformMatrix);
+            // DrawSingle(gameObject);
         }
     }
+
+
 
 }
 

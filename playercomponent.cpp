@@ -26,6 +26,8 @@ void PlayerComponent::Move()
     // Pour eviter des artefacts dans les déplacements liés à une chute de FrameRate
     double dt = std::min((1/30.0) , MainWidget::deltaTime);
 
-    gameObject->collider->Move(v * dt * 7.5);
+    gameObject->collider->Move(v * dt * 5);
+
+
 }
 

@@ -95,6 +95,15 @@ void  MapMaker::CreateLevel(QString mapfile)
                         (MainWidget::gameObjects).push_back(gameObject);
                         //m->Compute(gameObject->transform);
                     }
+                    else if (c == 'M')
+                    {
+                        gameObject->collider = bc;
+                        gameObject->meshId = 10;
+                        bc->gameObject = gameObject;
+                        gameObject->transform->getMatrix();
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        //m->Compute(gameObject->transform);
+                    }
                     else if (c == 'X')
                     {
 
@@ -151,6 +160,8 @@ void  MapMaker::CreateLevel(QString mapfile)
                         gameObject->components.push_back(ic);
                         gameObject->meshId = 9;
                         gameObject->collider = bc;
+                        bc->size = QVector3D(1,1,0.25);
+                        bc->center += QVector3D(0,0,0.75);
                         bc->gameObject = gameObject;
                         (MainWidget::gameObjects).push_back(gameObject);
                         //m->Compute(gameObject->transform);
@@ -166,7 +177,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                         gameObject->components.push_back(cbc);
                         cbc->gameObject = gameObject;
                         cbc->startState = false;
-
+                        //gameObject->meshId = 5;
                         gameObject->collider = bc;
                         bc->gameObject = gameObject;
                         bc->isTrigger= true;
@@ -314,6 +325,13 @@ void MapMaker::InstantiateMesh()
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
     m->Load("../ProjectMDJ/cloud.obj");
     m->LoadTexture("../ProjectMDJ/white.png");
+    m->Compute(t);
+
+    // 10 - MUD (M)
+    MeshRenderer::instance->meshes.push_back(new Mesh3D());
+    m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
+    m->Load("../ProjectMDJ/block.obj");
+    m->LoadTexture("../ProjectMDJ/mud.png");
     m->Compute(t);
 
 }

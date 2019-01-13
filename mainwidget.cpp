@@ -56,7 +56,8 @@
 #include "playercomponent.h"
 #include "mapmaker.h"
 #include "boxcollidercomponent.h"
-#include "QtGamepad/QGamepadManager"
+#include "switchcomponent.h"
+
 #include "meshrenderer.h"
 
 double MainWidget::deltaTime = 0;
@@ -79,6 +80,7 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     heightCamera = 25;
     MainWidget::deltaTime = 0;
     radiusCamera = 45;
+
 }
 
 MainWidget::~MainWidget()
@@ -217,8 +219,8 @@ void MainWidget::initializeGL()
 
     // Creation du niveau
     MapMaker mapMaker;
-    mapMaker.CreateLevel("../ProjectMDJ/level01.txt");
-    //
+    mapMaker.CreateLevel("../ProjectMDJ/level03.txt");
+
 
     Mesh3D *m3 = new Mesh3D();
     m3->Load("../ProjectMDJ/skybox.obj");
@@ -229,8 +231,8 @@ void MainWidget::initializeGL()
     playerObject = new GameObject();
 
     Mesh3D *m5 = new Mesh3D();
-    m5->Load("../ProjectMDJ/block.obj");
-    m5->LoadTexture("../ProjectMDJ/PlayerTexture.png");
+    m5->Load("../ProjectMDJ/player.obj");
+    m5->LoadTexture("../ProjectMDJ/player.png");
     playerObject->meshId = MeshRenderer::instance->meshes.size();
     m5->Compute();
     MeshRenderer::instance->meshes.push_back(m5);
@@ -258,8 +260,8 @@ void MainWidget::initializeGL()
 
 
     BoxColliderComponent *bc = new BoxColliderComponent();
-    bc->size = QVector3D(1,1,1)*0.875f;
-    playerObject->transform->scale *= 0.875f;
+    bc->size = QVector3D(1,1,1)*0.7f;
+    playerObject->transform->scale *= 0.7f;
     //bc->gameObjects = &gameObjects;
     bc->center = playerObject->transform->position;
     playerObject->collider = bc;
@@ -284,6 +286,7 @@ void MainWidget::initializeGL()
     //MeshRenderer::instance->transitions[playerObject->meshId].push_back(playerObject->transform->transformMatrix);
 
     MeshRenderer::instance->Init(&program);
+
 
     m_time.start();
 }
@@ -350,7 +353,45 @@ void MainWidget::initTextures()
 
 void MainWidget::Joypad()
 {
+    qDebug() << "Find Gamepad ...";
+    auto gamepads = QGamepadManager::instance()->connectedGamepads();
+    //qDebug() << "GamePad size: " << gamepads.size();
+    if (gamepads.isEmpty()) {
+        return;
+    }
 
+    gamepad = new QGamepad(*gamepads.begin(), this);
+    //qDebug() << gamepad;
+    connect(gamepad, &QGamepad::axisRightXChanged, this, [](double value)
+        {
+            InputMapping::inputMap["CameraHorizontalAxis"] = -value;
+        }
+        );
+    connect(gamepad, &QGamepad::axisRightYChanged, this, [](double value)
+        {
+            InputMapping::inputMap["CameraVerticalAxis"] = -value;
+        }
+        );
+    connect(gamepad, &QGamepad::axisLeftYChanged, this, [](double value)
+        {
+            InputMapping::inputMap["HorizontalAxis"] = -value;
+        }
+        );
+    connect(gamepad, &QGamepad::axisLeftXChanged, this, [](double value)
+        {
+            InputMapping::inputMap["VerticalAxis"] = value;
+        }
+        );
+    connect(gamepad, &QGamepad::buttonStartChanged, this, [](bool value)
+        {
+            if (value) SwitchComponent::activate = !SwitchComponent::activate;
+        }
+        );
+    connect(gamepad, &QGamepad::buttonAChanged, this, [](bool value)
+        {
+            if (value) GravityComponent::gravity *= -1;
+        }
+        );
 }
 
 
@@ -405,22 +446,24 @@ void MainWidget::paintGL()
     //MeshRenderer::instance->Init(&program);
 
     MeshRenderer::instance->ComputeGameObject();
-    MeshRenderer::instance->Draw(&program);
 
 
 
-    playerObject->transform->getMatrix();
-    MeshRenderer::instance->transitions[playerObject->meshId][0] = playerObject->transform->transformMatrix;
+
+    /*playerObject->transform->getMatrix();
+    MeshRenderer::instance->transitions[playerObject->meshId][0] = playerObject->transform->transformMatrix;*/
 
 
     //qDebug() << "Player: " << playerObject->transform->transformMatrix;
 
+    MeshRenderer::instance->Draw(&program);
     update();
 
 }
 
 void MainWidget::Update()
 {
+    if(gamepad == nullptr) Joypad();
     MainWidget::deltaTime = m_time.elapsed() / 1000.0f;
     deltaTimeFPS += deltaTime;
     m_time.restart();
@@ -436,7 +479,10 @@ void MainWidget::Update()
                           radiusCamera * sin(applicationTime)*cos(heightCamera),
                           radiusCamera * sin(heightCamera));
 
-    targetCamera += (playerObject->transform->position  - targetCamera) *0.5f;
+    if (heightCamera > 1.3) heightCamera = 1.3;
+    if (heightCamera < -1.3) heightCamera = -1.3;
+
+    targetCamera += (playerObject->transform->position  - targetCamera) *0.0f;
 
     for (unsigned int i = 0; i < playerObject->components.size(); i++)
     {
@@ -455,8 +501,10 @@ void MainWidget::Update()
 
     if (playerObject->transform->position.z() < -5 || playerObject->transform->position.z() > 20)
     {
+
         playerObject->collider->Teleport(startPosition);
         if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
+        qDebug() << "Dead";
     }
 
     //std::cout << "Update Time : " << updateTime.elapsed() << "ms [" << 1.0/(updateTime.elapsed()/1000.0) <<"]"<< std::endl;
