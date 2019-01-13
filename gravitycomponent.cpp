@@ -20,7 +20,7 @@ void GravityComponent::Do()
     gameObject->collider->Move(v);
     //gameObject->mesh->Compute(gameObject->transform);
     //MeshRenderer::instance->DrawSingle(gameObject);
-    MeshRenderer::instance->DrawSingle(gameObject);
+    //MeshRenderer::instance->DrawSingle(gameObject);
 
 }
 

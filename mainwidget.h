@@ -83,6 +83,8 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
 
 public:
     static double deltaTime;
+    static int score;
+
     explicit MainWidget(double value, int seasonStart, QWidget *parent = 0);
     ~MainWidget();
     int z = 0;
@@ -91,6 +93,7 @@ public:
    static std::vector<GameObject *> gameObjects;
    QTime m_time;
    int m_frameCount;
+   void ChangeLevel(QString level);
    static GameObject *playerObject;
    static QVector3D startPosition;
    int frameNumber = 0;

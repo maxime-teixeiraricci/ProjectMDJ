@@ -64,6 +64,7 @@ double MainWidget::deltaTime = 0;
 GameObject* MainWidget::playerObject = nullptr;
 std::vector<GameObject *> MainWidget::gameObjects;
 QVector3D MainWidget::startPosition = QVector3D(0,0,0);
+int MainWidget::score = 0;
 
 MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     QOpenGLWidget(parent),
@@ -199,27 +200,11 @@ void MainWidget::timerEvent(QTimerEvent *)
     update();
 }
 
-void MainWidget::initializeGL()
+void MainWidget::ChangeLevel(QString level)
 {
-    initializeOpenGLFunctions();
-
-    glClearColor(0, 0, 0, 1);
-
-    initShaders();
-    initTextures();
-
-//! [2]
-    // Enable depth buffer
-    glEnable(GL_DEPTH_TEST);
-
-    // Enable back face culling
-    glEnable( GL_FRONT);
-
-//! [2]
-
     // Creation du niveau
     MapMaker mapMaker;
-    mapMaker.CreateLevel("../ProjectMDJ/level03.txt");
+    mapMaker.CreateLevel(level);
 
 
     Mesh3D *m3 = new Mesh3D();
@@ -244,20 +229,6 @@ void MainWidget::initializeGL()
     playerObject->components.push_back(gc);
     gameObjects.push_back(playerObject);
     playerObject->transform->SetPosition(startPosition);
-/*
-    for (unsigned int i = 0 ; i < gameObjects.size(); i ++)
-    {
-        BoxColliderComponent *bc = new BoxColliderComponent();
-        bc->size = QVector3D(1,1,1);
-
-
-        bc->gameObjects = &gameObjects;
-        bc->center = gameObjects[i]->transform->position;
-        gameObjects[i]->collider = bc;
-        bc->gameObject = gameObjects[i];
-    }
-*/
-
 
     BoxColliderComponent *bc = new BoxColliderComponent();
     bc->size = QVector3D(1,1,1)*0.7f;
@@ -275,9 +246,6 @@ void MainWidget::initializeGL()
     MeshRenderer::instance->meshes.push_back(m3);
     //gameObjects.push_back(playerObject);
 
-
-
-
     //MeshRenderer::instance->meshes.push_back(m5);
 
     gameObjects.push_back(skybox);
@@ -285,7 +253,29 @@ void MainWidget::initializeGL()
     //MeshRenderer::instance->transitions[skybox->meshId].push_back(skybox->transform->transformMatrix);
     //MeshRenderer::instance->transitions[playerObject->meshId].push_back(playerObject->transform->transformMatrix);
 
+
     MeshRenderer::instance->Init(&program);
+}
+
+void MainWidget::initializeGL()
+{
+    initializeOpenGLFunctions();
+
+    glClearColor(0, 0, 0, 1);
+
+    initShaders();
+    initTextures();
+
+//! [2]
+    // Enable depth buffer
+    glEnable(GL_DEPTH_TEST);
+
+    // Enable back face culling
+    glEnable( GL_FRONT);
+
+//! [2]
+
+    ChangeLevel("../ProjectMDJ/level04.txt");
 
 
     m_time.start();
@@ -369,7 +359,7 @@ void MainWidget::Joypad()
         );
     connect(gamepad, &QGamepad::axisRightYChanged, this, [](double value)
         {
-            InputMapping::inputMap["CameraVerticalAxis"] = -value;
+            InputMapping::inputMap["CameraVerticalAxis"] = value;
         }
         );
     connect(gamepad, &QGamepad::axisLeftYChanged, this, [](double value)
@@ -482,7 +472,7 @@ void MainWidget::Update()
     if (heightCamera > 1.3) heightCamera = 1.3;
     if (heightCamera < -1.3) heightCamera = -1.3;
 
-    targetCamera += (playerObject->transform->position  - targetCamera) *0.0f;
+    targetCamera += (playerObject->transform->position  - targetCamera) *0.1f;
 
     for (unsigned int i = 0; i < playerObject->components.size(); i++)
     {
@@ -505,6 +495,14 @@ void MainWidget::Update()
         playerObject->collider->Teleport(startPosition);
         if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
         qDebug() << "Dead";
+    }
+
+    if (MainWidget::score == 6)
+    {
+        MainWidget::score = 0;
+        MainWidget::gameObjects.clear();
+        ChangeLevel("../ProjectMDJ/level04.txt");
+        if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
     }
 
     //std::cout << "Update Time : " << updateTime.elapsed() << "ms [" << 1.0/(updateTime.elapsed()/1000.0) <<"]"<< std::endl;

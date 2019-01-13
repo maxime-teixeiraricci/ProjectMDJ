@@ -12,6 +12,6 @@ void RotationComponent::Do()
     gameObject->transform->rotation = QQuaternion::fromEulerAngles(gameObject->transform->eulerAngle);
     gameObject->transform->getMatrix();
 
-    MeshRenderer::instance->DrawSingle(gameObject);
+    //MeshRenderer::instance->DrawSingle(gameObject);
     //gameObject->mesh->Compute(gameObject->transform);
 }

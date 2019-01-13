@@ -28,6 +28,7 @@ public:
     unsigned int *EBOs;
     unsigned int *vertexVBOs;
     unsigned int *instanceVBOs;
+    bool done= false;
 
 };
 
