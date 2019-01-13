@@ -285,7 +285,7 @@ void MainWidget::initializeGL()
                   "../ProjectMDJ/level03.txt",
                   "../ProjectMDJ/level04.txt",
                   "../ProjectMDJ/level05.txt",
-                  "../ProjectMDJ/level06.txt"};
+                  "../ProjectMDJ/level07.txt"};
 
     //gameObjects.push_back(playerObject);
 
@@ -512,7 +512,7 @@ void MainWidget::Update()
         }
     }
 
-    if (playerObject->transform->position.z() < -5 || playerObject->transform->position.z() > 20)
+    if (playerObject->transform->position.z() < -15 || playerObject->transform->position.z() > 45)
     {
 
         ChangeLevel(MainWidget::listLevels[MainWidget::levelNumber]);

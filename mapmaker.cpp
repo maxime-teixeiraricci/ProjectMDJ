@@ -78,7 +78,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                     //Mesh3D *m = new Mesh3D();
                     GameObject *gameObject = new GameObject();
                     float x = -(X/2.0) + i;
-                    float y = -(Y/2.0) + j;
+                    float y = (Y/2.0) - j;
                     gameObject->transform->position = QVector3D(x*2, y*2, Z*2);
                     BoxColliderComponent *bc = new BoxColliderComponent();
                     bc->size = QVector3D(1,1,1);
@@ -108,7 +108,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                     {
 
                         gameObject->collider = bc;
-                        bc->size = QVector3D(1,1,1)*0.99f;
+                        bc->size = QVector3D(1,1,1)*0.99;
 
                         bc->gameObject = gameObject;
                         GravityComponent *gc = new GravityComponent();
