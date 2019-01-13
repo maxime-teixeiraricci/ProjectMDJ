@@ -285,7 +285,8 @@ void MainWidget::initializeGL()
                   "../ProjectMDJ/level03.txt",
                   "../ProjectMDJ/level04.txt",
                   "../ProjectMDJ/level05.txt",
-                  "../ProjectMDJ/level07.txt"};
+                  "../ProjectMDJ/level07.txt",
+                  "../ProjectMDJ/level08.txt"};
 
     //gameObjects.push_back(playerObject);
 
