@@ -160,6 +160,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                         gameObject->components.push_back(ic);
                         gameObject->meshId = 9;
                         gameObject->collider = bc;
+                        gameObject->isDrawable = false;
                         bc->size = QVector3D(1,1,0.25);
                         bc->center += QVector3D(0,0,0.75);
                         bc->gameObject = gameObject;
@@ -253,6 +254,7 @@ void MapMaker::InstantiateMesh()
     Mesh3D *m;
     Transform *t = new Transform();
     t->position = QVector3D(0,0,0);
+    MeshRenderer::instance->meshes.clear();
 
     // 0 - GRASS BLOCK (H)
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
@@ -271,28 +273,28 @@ void MapMaker::InstantiateMesh()
     m->Compute(t);
 
 
-    // 2 - WIRED BLOCK BLUE (2)
+    // 2 - WIRED BLOCK BLUE
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
     m->Load("../ProjectMDJ/wiredCube.obj");
     m->LoadTexture("../ProjectMDJ/blueBlock.png");
     m->Compute(t);
 
-    // 3 - FULL BLOCK BLUE (3)
+    // 3 - FULL BLOCK BLUE
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
     m->Load("../ProjectMDJ/fullCube.obj");
     m->LoadTexture("../ProjectMDJ/blueBlock.png");
     m->Compute(t);
 
-    // 4 - WIRED BLOCK RED (?)
+    // 4 - WIRED BLOCK RED
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
     m->Load("../ProjectMDJ/wiredCube.obj");
     m->LoadTexture("../ProjectMDJ/redBlock.png");
     m->Compute(t);
 
-    // 5 - FULL BLOCK RED (?)
+    // 5 - FULL BLOCK RED
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
     m->Load("../ProjectMDJ/fullCube.obj");
@@ -313,6 +315,8 @@ void MapMaker::InstantiateMesh()
     m->LoadTexture("../ProjectMDJ/blueSwitch.png");
     m->Compute(t);
 
+
+
     // 8 - STAR (C)
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
@@ -332,6 +336,13 @@ void MapMaker::InstantiateMesh()
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
     m->Load("../ProjectMDJ/block.obj");
     m->LoadTexture("../ProjectMDJ/mud.png");
+    m->Compute(t);
+
+    // 11 - SWITCH DOWN BLACK
+    MeshRenderer::instance->meshes.push_back(new Mesh3D());
+    m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
+    m->Load("../ProjectMDJ/switchDown.obj");
+    m->LoadTexture("../ProjectMDJ/blackSwitch.png");
     m->Compute(t);
 
 }

@@ -65,6 +65,8 @@ GameObject* MainWidget::playerObject = nullptr;
 std::vector<GameObject *> MainWidget::gameObjects;
 QVector3D MainWidget::startPosition = QVector3D(0,0,0);
 int MainWidget::score = 0;
+int MainWidget::levelNumber = 0;
+QList<QString> MainWidget::listLevels;
 
 MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     QOpenGLWidget(parent),
@@ -202,17 +204,13 @@ void MainWidget::timerEvent(QTimerEvent *)
 
 void MainWidget::ChangeLevel(QString level)
 {
+
+    MainWidget::score = 0;
+    SwitchComponent::activate = false;
     // Creation du niveau
     MapMaker mapMaker;
     mapMaker.CreateLevel(level);
 
-
-    Mesh3D *m3 = new Mesh3D();
-    m3->Load("../ProjectMDJ/skybox.obj");
-    m3->LoadTexture(":/Daylight Box UV.png");
-    m3->Compute();
-
-    // PLAYER
     playerObject = new GameObject();
 
     Mesh3D *m5 = new Mesh3D();
@@ -227,9 +225,8 @@ void MainWidget::ChangeLevel(QString level)
     GravityComponent *gc = new GravityComponent();
     gc->gameObject = playerObject;
     playerObject->components.push_back(gc);
-    gameObjects.push_back(playerObject);
-    playerObject->transform->SetPosition(startPosition);
 
+    playerObject->transform->SetPosition(startPosition);
     BoxColliderComponent *bc = new BoxColliderComponent();
     bc->size = QVector3D(1,1,1)*0.7f;
     playerObject->transform->scale *= 0.7f;
@@ -240,20 +237,27 @@ void MainWidget::ChangeLevel(QString level)
 
     bc->gameObject = playerObject;
 
+    Mesh3D *m3 = new Mesh3D();
+    m3->Load("../ProjectMDJ/skybox.obj");
+    m3->LoadTexture(":/Daylight Box UV.png");
+    m3->Compute();
+
     skybox = new GameObject();
     skybox->transform->scale *= 3;
     skybox->meshId = MeshRenderer::instance->meshes.size();
     MeshRenderer::instance->meshes.push_back(m3);
-    //gameObjects.push_back(playerObject);
 
-    //MeshRenderer::instance->meshes.push_back(m5);
 
-    gameObjects.push_back(skybox);
+    // PLAYER
+
+
+
     MeshRenderer::instance->ComputeGameObject();
     //MeshRenderer::instance->transitions[skybox->meshId].push_back(skybox->transform->transformMatrix);
     //MeshRenderer::instance->transitions[playerObject->meshId].push_back(playerObject->transform->transformMatrix);
 
-
+    gameObjects.push_back(playerObject);
+    gameObjects.push_back(skybox);
     MeshRenderer::instance->Init(&program);
 }
 
@@ -274,8 +278,22 @@ void MainWidget::initializeGL()
     glEnable( GL_FRONT);
 
 //! [2]
+//!
+//!
+    listLevels = {"../ProjectMDJ/level01.txt",
+                  "../ProjectMDJ/level02.txt",
+                  "../ProjectMDJ/level03.txt",
+                  "../ProjectMDJ/level04.txt",
+                  "../ProjectMDJ/level05.txt",
+                  "../ProjectMDJ/level06.txt"};
 
-    ChangeLevel("../ProjectMDJ/level04.txt");
+    //gameObjects.push_back(playerObject);
+
+    //MeshRenderer::instance->meshes.push_back(m5);
+
+
+
+    ChangeLevel(MainWidget::listLevels[MainWidget::levelNumber]);
 
 
     m_time.start();
@@ -377,6 +395,11 @@ void MainWidget::Joypad()
             if (value) SwitchComponent::activate = !SwitchComponent::activate;
         }
         );
+    connect(gamepad, &QGamepad::buttonSelectChanged, this, [](bool value)
+        {
+            if (value) MainWidget::score = 5;
+        }
+        );
     connect(gamepad, &QGamepad::buttonAChanged, this, [](bool value)
         {
             if (value) GravityComponent::gravity *= -1;
@@ -461,8 +484,8 @@ void MainWidget::Update()
     QTime updateTime = QTime();
     updateTime.start();
 
-    applicationTime += InputMapping::inputMap["CameraHorizontalAxis"] *0.05 ;
-    heightCamera += InputMapping::inputMap["CameraVerticalAxis"] * 0.05;
+    applicationTime += -GravityComponent::GetDirection() * InputMapping::inputMap["CameraHorizontalAxis"] *0.035 ;
+    heightCamera += -GravityComponent::GetDirection() * InputMapping::inputMap["CameraVerticalAxis"] * 0.035;
 
     float radius = 45.0f;
     posCamera = QVector3D(radiusCamera * cos(applicationTime)*cos(heightCamera),
@@ -472,7 +495,7 @@ void MainWidget::Update()
     if (heightCamera > 1.3) heightCamera = 1.3;
     if (heightCamera < -1.3) heightCamera = -1.3;
 
-    targetCamera += (playerObject->transform->position  - targetCamera) *0.1f;
+    targetCamera += (playerObject->transform->position  - targetCamera) *0.05f;
 
     for (unsigned int i = 0; i < playerObject->components.size(); i++)
     {
@@ -492,16 +515,17 @@ void MainWidget::Update()
     if (playerObject->transform->position.z() < -5 || playerObject->transform->position.z() > 20)
     {
 
-        playerObject->collider->Teleport(startPosition);
+        ChangeLevel(MainWidget::listLevels[MainWidget::levelNumber]);
         if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
         qDebug() << "Dead";
     }
 
-    if (MainWidget::score == 6)
+    if (MainWidget::score == 5)
     {
         MainWidget::score = 0;
-        MainWidget::gameObjects.clear();
-        ChangeLevel("../ProjectMDJ/level04.txt");
+        MainWidget::levelNumber  = (MainWidget::levelNumber + 1) % MainWidget::listLevels.size();
+        //MainWidget::gameObjects.clear();
+        ChangeLevel(MainWidget::listLevels[MainWidget::levelNumber]);
         if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
     }
 

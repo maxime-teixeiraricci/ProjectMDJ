@@ -96,6 +96,8 @@ public:
    void ChangeLevel(QString level);
    static GameObject *playerObject;
    static QVector3D startPosition;
+   static QList<QString> listLevels;
+   static int levelNumber;
    int frameNumber = 0;
    float deltaTimeFPS;
    void Joypad();

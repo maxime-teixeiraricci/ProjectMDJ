@@ -15,7 +15,7 @@ void PlayerComponent::Do()
 void PlayerComponent::Move()
 {
     // On va tester si le mouvement rentre en collision ou pas
-    float dx = -GravityComponent::GetDirection() *InputMapping::inputMap["VerticalAxis"];   // Déplacement vertical
+    float dx =  InputMapping::inputMap["VerticalAxis"] * (-GravityComponent::GetDirection());   // Déplacement vertical
     float dy =  InputMapping::inputMap["HorizontalAxis"]; // Déplacement horizontal
 
     QVector3D forward = QVector3D(Mesh3D::vectorCamera.x(), Mesh3D::vectorCamera.y(), 0).normalized();
