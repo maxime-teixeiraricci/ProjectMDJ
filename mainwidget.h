@@ -84,28 +84,31 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
 public:
     static double deltaTime;
     static int score;
+    static GameObject *playerObject;
+    static QVector3D startPosition;
+    static QList<QString> listLevels;
+    static int levelNumber;
+    static std::vector<GameObject *> gameObjects;
 
     explicit MainWidget(double value, int seasonStart, QWidget *parent = 0);
     ~MainWidget();
-    int z = 0;
-    int season = 0;
-   std::vector<QOpenGLTexture *> textures;
-   static std::vector<GameObject *> gameObjects;
-   QTime m_time;
-   int m_frameCount;
-   void ChangeLevel(QString level);
-   static GameObject *playerObject;
-   static QVector3D startPosition;
-   static QList<QString> listLevels;
-   static int levelNumber;
-   int frameNumber = 0;
-   float deltaTimeFPS;
-   void Joypad();
-   QGamepad *gamepad = nullptr;
+
+
+    std::vector<QOpenGLTexture *> textures;
+
+
+    QTime m_time;
+
+    int m_frameCount;
+    void ChangeLevel(QString level);
+
+    int frameNumber = 0;
+    float deltaTimeFPS;
+    void Joypad();
+    QGamepad *gamepad = nullptr;
 
 public slots:
-     void seasonChange();
-     void Update();
+    void Update();
 
 
 protected:
@@ -138,11 +141,7 @@ private:
     qreal angularSpeed;
     QQuaternion rotation;
 
-    QColor *seasonColors = new QColor[4]{QColor(194,249,113),
-                                        QColor(240,216,140),
-                                        QColor(231,162,150),
-                                        QColor(216,216,216)};
-    GameObject *skybox = 0;
+    GameObject *skybox = nullptr;
 
     double time;
     double timeScale;

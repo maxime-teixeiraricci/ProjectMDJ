@@ -75,8 +75,6 @@ MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     timeScale(1.0f)
 {
     timeFrequence = 1.0/frequence*1000;
-    season = seasonStart;
-    z = 0;
     setMouseTracking(true);
     applicationTime = 0;
     rotate = 0;
@@ -206,7 +204,9 @@ void MainWidget::ChangeLevel(QString level)
 {
 
     MainWidget::score = 0;
+    if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
     SwitchComponent::activate = false;
+
     // Creation du niveau
     MapMaker mapMaker;
     mapMaker.CreateLevel(level);
@@ -214,8 +214,8 @@ void MainWidget::ChangeLevel(QString level)
     playerObject = new GameObject();
 
     Mesh3D *m5 = new Mesh3D();
-    m5->Load("../ProjectMDJ/player.obj");
-    m5->LoadTexture("../ProjectMDJ/player.png");
+    m5->Load("../ProjectMDJ/Model/player.obj");
+    m5->LoadTexture("../ProjectMDJ/Texture/player.png");
     playerObject->meshId = MeshRenderer::instance->meshes.size();
     m5->Compute();
     MeshRenderer::instance->meshes.push_back(m5);
@@ -238,8 +238,8 @@ void MainWidget::ChangeLevel(QString level)
     bc->gameObject = playerObject;
 
     Mesh3D *m3 = new Mesh3D();
-    m3->Load("../ProjectMDJ/skybox.obj");
-    m3->LoadTexture(":/Daylight Box UV.png");
+    m3->Load("../ProjectMDJ/Model/skybox.obj");
+    m3->LoadTexture("../ProjectMDJ/Texture/Daylight Box UV.png");
     m3->Compute();
 
     skybox = new GameObject();
@@ -280,13 +280,14 @@ void MainWidget::initializeGL()
 //! [2]
 //!
 //!
-    listLevels = {"../ProjectMDJ/level01.txt",
-                  "../ProjectMDJ/level02.txt",
-                  "../ProjectMDJ/level03.txt",
-                  "../ProjectMDJ/level04.txt",
-                  "../ProjectMDJ/level05.txt",
-                  "../ProjectMDJ/level07.txt",
-                  "../ProjectMDJ/level08.txt"};
+    listLevels = {"../ProjectMDJ/Levels/levelTest2.txt",
+                  "../ProjectMDJ/Levels/level01.txt",
+                  "../ProjectMDJ/Levels/level02.txt",
+                  "../ProjectMDJ/Levels/level03.txt",
+                  "../ProjectMDJ/Levels/level04.txt",
+                  "../ProjectMDJ/Levels/level05.txt",
+                  "../ProjectMDJ/Levels/level07.txt",
+                  "../ProjectMDJ/Levels/level08.txt"};
 
     //gameObjects.push_back(playerObject);
 
@@ -300,10 +301,6 @@ void MainWidget::initializeGL()
     m_time.start();
 }
 
-void MainWidget::seasonChange()
-{
-    float deltaTime = m_time.elapsed();
-}
 
 //! [3]
 void MainWidget::initShaders()
@@ -345,26 +342,14 @@ void MainWidget::initTextures()
     texture->setWrapMode(QOpenGLTexture::Repeat);
 
 
-    textures.push_back(new QOpenGLTexture(QImage(":/spring.png").mirrored()));
-    textures.push_back(new QOpenGLTexture(QImage(":/summer.png").mirrored()));
-    textures.push_back(new QOpenGLTexture(QImage(":/fall.png").mirrored()));
-    textures.push_back(new QOpenGLTexture(QImage(":/winter.png").mirrored()));
-    for (unsigned i=0; i < 4; i ++)
-    {
-        textures[i]->setMinificationFilter(QOpenGLTexture::Nearest);
-        textures[i]->setMagnificationFilter(QOpenGLTexture::Linear);
-        textures[i]->setWrapMode(QOpenGLTexture::Repeat);
-    }
-
     m_frameCount = 0 ;
 }
 //! [4]
 
 void MainWidget::Joypad()
 {
-    qDebug() << "Find Gamepad ...";
+
     auto gamepads = QGamepadManager::instance()->connectedGamepads();
-    //qDebug() << "GamePad size: " << gamepads.size();
     if (gamepads.isEmpty()) {
         return;
     }
@@ -431,45 +416,18 @@ void MainWidget::paintGL()
     QTime paintTime = QTime();
     paintTime.start();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //texture->bind();
-
 
     QMatrix4x4 matrix;
-    matrix.lookAt(posCamera, // Eye
-                  targetCamera, // Center
+    matrix.lookAt(posCamera,                                            // Eye
+                  targetCamera,                                         // Center
                   QVector3D(0,0,1) * -GravityComponent::GetDirection()); // Normal
     Mesh3D::vectorCamera = (targetCamera - posCamera).normalized();
+
     program.setUniformValue("mvp_matrix", projection * matrix);
     // Use texture unit 0 which contains cube.png
     program.setUniformValue("texture", 0);
-    //skybox->Draw(&program);
-    //MeshRenderer::instance->DrawSingle(playerObject);
-
-
-    /*playerObject->Draw(&program);
-    for (unsigned int i = 0; i < gameObjects.size(); i++)
-    {
-        //if (gameObjects[i]->mesh->isDrawable) gameObjects[i]->Draw(&program);
-    }
-
-    //InputMapping::Reset();
-    //std::cout << "Paint Time : " << paintTime.elapsed() << "ms [" << 1.0/(paintTime.elapsed()/1000.0) <<"]"<< std::endl;
-    paintTime.restart();*/
-    //MeshRenderer::instance->Init(&program);
-    //MeshRenderer::instance->ComputeGameObject();
-    //MeshRenderer::instance->Init(&program);
 
     MeshRenderer::instance->ComputeGameObject();
-
-
-
-
-    /*playerObject->transform->getMatrix();
-    MeshRenderer::instance->transitions[playerObject->meshId][0] = playerObject->transform->transformMatrix;*/
-
-
-    //qDebug() << "Player: " << playerObject->transform->transformMatrix;
-
     MeshRenderer::instance->Draw(&program);
     update();
 
@@ -477,64 +435,62 @@ void MainWidget::paintGL()
 
 void MainWidget::Update()
 {
+    // Chronometre pour calculer le temps d'éxécution.
+    QTime updateTime = QTime();
+    updateTime.start();
+
+    // Si aucun gamepad n'a pas été trouvé
     if(gamepad == nullptr) Joypad();
+
     MainWidget::deltaTime = m_time.elapsed() / 1000.0f;
     deltaTimeFPS += deltaTime;
     m_time.restart();
 
-    QTime updateTime = QTime();
-    updateTime.start();
+
 
     applicationTime += -GravityComponent::GetDirection() * InputMapping::inputMap["CameraHorizontalAxis"] *0.035 ;
     heightCamera += -GravityComponent::GetDirection() * InputMapping::inputMap["CameraVerticalAxis"] * 0.035;
-
+    if (heightCamera > 1.3) heightCamera = 1.3;
+    if (heightCamera < -1.3) heightCamera = -1.3;
     float radius = 45.0f;
+
+
+    // CAMERA
     posCamera = QVector3D(radiusCamera * cos(applicationTime)*cos(heightCamera),
                           radiusCamera * sin(applicationTime)*cos(heightCamera),
                           radiusCamera * sin(heightCamera));
 
-    if (heightCamera > 1.3) heightCamera = 1.3;
-    if (heightCamera < -1.3) heightCamera = -1.3;
 
     targetCamera += (playerObject->transform->position  - targetCamera) *0.05f;
 
-    for (unsigned int i = 0; i < playerObject->components.size(); i++)
-    {
-        playerObject->components[i]->Do();
-    }
-    //qDebug() <<"Player : " <<  playerObject->transform->position;
-    //playerObject->mesh->Compute(playerObject->transform);
+    // Activation des composantas du joueur
+    for (unsigned int i = 0; i < playerObject->components.size(); i++) playerObject->components[i]->Do();
+
+    // Activation des composants des autres gameobjects
     for (unsigned int i = 0; i < gameObjects.size(); i++)
-    {
-
         for (unsigned int j = 0; j < gameObjects[i]->components.size(); j++)
-        {
             gameObjects[i]->components[j]->Do();
-        }
-    }
 
+
+
+    // Si le joueur sort des limites du niveau : Perdu (Recommencer)
     if (playerObject->transform->position.z() < -15 || playerObject->transform->position.z() > 45)
-    {
-
         ChangeLevel(MainWidget::listLevels[MainWidget::levelNumber]);
-        if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
-        qDebug() << "Dead";
-    }
 
+
+    // Si le joueur a les 5 étoiles : Gagner (Niveau suivant)
     if (MainWidget::score == 5)
     {
-        MainWidget::score = 0;
         MainWidget::levelNumber  = (MainWidget::levelNumber + 1) % MainWidget::listLevels.size();
-        //MainWidget::gameObjects.clear();
         ChangeLevel(MainWidget::listLevels[MainWidget::levelNumber]);
-        if (GravityComponent::GetDirection() > 0) GravityComponent::gravity *= -1;
     }
 
-    //std::cout << "Update Time : " << updateTime.elapsed() << "ms [" << 1.0/(updateTime.elapsed()/1000.0) <<"]"<< std::endl;
-    updateTime.restart();
 
-    //std::cout << "Update Time : " << MainWidget::deltaTime << "ms [FPS " << 1.0/MainWidget::deltaTime <<"]"<< std::endl;
+    updateTime.restart();
     frameNumber ++;
+
+
+
     if (frameNumber % 50 == 0)
     {
         std::cout << "Update Time : " << deltaTimeFPS/50.0 << "ms [FPS " << 1.0/(deltaTimeFPS/50.0)<<"]"<< std::endl;

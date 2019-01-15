@@ -69,24 +69,9 @@ int main(int argc, char *argv[])
     app.setApplicationName("cube");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    /* Création du Layout pour mettre les scenes sous forme de grille
-    QGridLayout mainLayout = new QGridLayout;
-    // Création du widget principal, qui va contenir les 4 autres widgets
-    QWidget *window = new QWidget;
 
-    //Création des 4 widgets;*/
-    MainWidget *widget1 = new MainWidget(60,0);
+    MainWidget *widget1 = new MainWidget(120,0);
 
-   /* //Timer permettant de faire changer les saisons
-
-    QObject::connect(timer, SIGNAL(timeout()), widget2, SLOT(seasonChange()));
-    QObject::connect(timer, SIGNAL(timeout()), widget3, SLOT(seasonChange()));
-    QObject::connect(timer, SIGNAL(timeout()), widget4, SLOT(seasonChange()));
-
-    timer->start(2500);
-
-    window->setLayout(mainLayout);
-    window->showMaximized();*/ // <- Permet de mettre la fenetre en grand.
     QTimer *timer = new QTimer();
     QObject::connect(timer, SIGNAL(timeout()), widget1, SLOT(Update()));
     timer->start(1000.0f * 1.0f/60.0f);

@@ -89,7 +89,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                     if (c == 'H')
                     {
                         gameObject->collider = bc;
-                        gameObject->meshId = 0;
+                        gameObject->meshId = MeshID::GRASS_BLOCK;
                         bc->gameObject = gameObject;
                         gameObject->transform->getMatrix();
                         (MainWidget::gameObjects).push_back(gameObject);
@@ -98,7 +98,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                     else if (c == 'M')
                     {
                         gameObject->collider = bc;
-                        gameObject->meshId = 10;
+                        gameObject->meshId = MeshID::MUD_BLOCK;
                         bc->gameObject = gameObject;
                         gameObject->transform->getMatrix();
                         (MainWidget::gameObjects).push_back(gameObject);
@@ -115,7 +115,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                         gc->gameObject = gameObject;
                         gameObject->components.push_back(gc);
                         gameObject->transform->scale *= 0.99f;
-                        gameObject->meshId = 1;
+                        gameObject->meshId = MeshID::MOVABLE_BLOCK;
                         (MainWidget::gameObjects).push_back(gameObject);
                     }
                     else if (c == 'Q')
@@ -130,7 +130,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                         bc->gameObject = gameObject;
                         bc->size = QVector3D(1,1,1)*0.75f;
                         bc->isTrigger = true;
-                        gameObject->meshId = 6;
+                        gameObject->meshId = MeshID::SWITCH_UP_RED;
                         gameObject->components.push_back(sc);
                         (MainWidget::gameObjects).push_back(gameObject);
 
@@ -147,7 +147,7 @@ void  MapMaker::CreateLevel(QString mapfile)
                         bc->gameObject = gameObject;
                         bc->size = QVector3D(1,1,1)*0.75f;
                         bc->isTrigger = true;
-                        gameObject->meshId =7;
+                        gameObject->meshId = MeshID::SWITCH_UP_BLUE;
                         gameObject->components.push_back(sc);
                         (MainWidget::gameObjects).push_back(gameObject);
                         //m->Compute(gameObject->transform);
@@ -158,9 +158,22 @@ void  MapMaker::CreateLevel(QString mapfile)
                         InvisibiltyComponent *ic = new InvisibiltyComponent();
                         ic->gameObject = gameObject;
                         gameObject->components.push_back(ic);
-                        gameObject->meshId = 9;
+                        gameObject->meshId = MeshID::INVISIBLE_BLOCK;
                         gameObject->collider = bc;
                         gameObject->isDrawable = false;
+                        bc->size = QVector3D(1,1,0.25);
+                        bc->center += QVector3D(0,0,0.75);
+                        bc->gameObject = gameObject;
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        //m->Compute(gameObject->transform);
+                    }
+                    else if (c == 'W')
+                    {
+
+
+                        gameObject->meshId = MeshID::PLANK_BLOCK;
+                        gameObject->collider = bc;
+                        gameObject->isDrawable = true;
                         bc->size = QVector3D(1,1,0.25);
                         bc->center += QVector3D(0,0,0.75);
                         bc->gameObject = gameObject;
@@ -219,7 +232,7 @@ void  MapMaker::CreateLevel(QString mapfile)
 
                         gameObject->components.push_back(scc);
 
-                        gameObject->meshId = 8;
+                        gameObject->meshId = MeshID::STAR;
                         (MainWidget::gameObjects).push_back(gameObject);
                         //m->Compute(gameObject->transform);
 
@@ -259,8 +272,8 @@ void MapMaker::InstantiateMesh()
     // 0 - GRASS BLOCK (H)
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/block.obj");
-    m->LoadTexture("../ProjectMDJ/grass.png");
+    m->Load("../ProjectMDJ/Model/block.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/Grass2.png");
     m->Compute(t);
 
 
@@ -268,51 +281,51 @@ void MapMaker::InstantiateMesh()
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
     t->position = QVector3D(0,0,0);
-    m->Load("../ProjectMDJ/block.obj");
-    m->LoadTexture("../ProjectMDJ/block.png");
+    m->Load("../ProjectMDJ/Model/block.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/block.png");
     m->Compute(t);
 
 
     // 2 - WIRED BLOCK BLUE
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/wiredCube.obj");
-    m->LoadTexture("../ProjectMDJ/blueBlock.png");
+    m->Load("../ProjectMDJ/Model/wiredCube.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/blueBlock.png");
     m->Compute(t);
 
     // 3 - FULL BLOCK BLUE
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/fullCube.obj");
-    m->LoadTexture("../ProjectMDJ/blueBlock.png");
+    m->Load("../ProjectMDJ/Model/fullCube.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/blueBlock.png");
     m->Compute(t);
 
     // 4 - WIRED BLOCK RED
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/wiredCube.obj");
-    m->LoadTexture("../ProjectMDJ/redBlock.png");
+    m->Load("../ProjectMDJ/Model/wiredCube.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/redBlock.png");
     m->Compute(t);
 
     // 5 - FULL BLOCK RED
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/fullCube.obj");
-    m->LoadTexture("../ProjectMDJ/redBlock.png");
+    m->Load("../ProjectMDJ/Model/fullCube.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/redBlock.png");
     m->Compute(t);
 
     // 6 - SWITCH UP RED (Q)
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/switchUp.obj");
-    m->LoadTexture("../ProjectMDJ/redSwitch.png");
+    m->Load("../ProjectMDJ/Model/switchUp.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/redSwitch.png");
     m->Compute(t);
 
     // 7 - SWITCH UP BLUE (Z)
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/switchUp.obj");
-    m->LoadTexture("../ProjectMDJ/blueSwitch.png");
+    m->Load("../ProjectMDJ/Model/switchUp.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/blueSwitch.png");
     m->Compute(t);
 
 
@@ -320,29 +333,36 @@ void MapMaker::InstantiateMesh()
     // 8 - STAR (C)
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/star.obj");
-    m->LoadTexture("../ProjectMDJ/gold.png");
+    m->Load("../ProjectMDJ/Model/star.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/gold.png");
     m->Compute(t);
 
     // 9 - INVISIBLE BLOCK (I)
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/cloud.obj");
-    m->LoadTexture("../ProjectMDJ/white.png");
+    m->Load("../ProjectMDJ/Model/cloud.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/white.png");
     m->Compute(t);
 
     // 10 - MUD (M)
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/block.obj");
-    m->LoadTexture("../ProjectMDJ/mud.png");
+    m->Load("../ProjectMDJ/Model/block.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/Mud2.png");
     m->Compute(t);
 
     // 11 - SWITCH DOWN BLACK
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
-    m->Load("../ProjectMDJ/switchDown.obj");
-    m->LoadTexture("../ProjectMDJ/blackSwitch.png");
+    m->Load("../ProjectMDJ/Model/switchDown.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/blackSwitch.png");
+    m->Compute(t);
+
+    // 12 - PLANK BLOCK
+    MeshRenderer::instance->meshes.push_back(new Mesh3D());
+    m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
+    m->Load("../ProjectMDJ/Model/plank.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/plank.png");
     m->Compute(t);
 
 }

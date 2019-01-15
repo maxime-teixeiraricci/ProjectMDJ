@@ -1,5 +1,6 @@
 #include "rotationcomponent.h"
 #include "meshrenderer.h"
+#include "mainwidget.h"
 
 RotationComponent::RotationComponent()
 {
@@ -8,10 +9,6 @@ RotationComponent::RotationComponent()
 
 void RotationComponent::Do()
 {
-    gameObject->transform->eulerAngle += QVector3D(0,0,5);
+    gameObject->transform->eulerAngle += QVector3D(0,0,90) * MainWidget::deltaTime;
     gameObject->transform->rotation = QQuaternion::fromEulerAngles(gameObject->transform->eulerAngle);
-    gameObject->transform->getMatrix();
-
-    //MeshRenderer::instance->DrawSingle(gameObject);
-    //gameObject->mesh->Compute(gameObject->transform);
 }

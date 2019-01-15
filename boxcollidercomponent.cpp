@@ -38,6 +38,7 @@ bool BoxColliderComponent::Collide(BoxColliderComponent *collider)
 
 void BoxColliderComponent::Move(QVector3D moveVect)
 {
+
     QVector3D currentCenter = center;
     center += moveVect;
     for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
@@ -49,11 +50,21 @@ void BoxColliderComponent::Move(QVector3D moveVect)
             BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (MainWidget::gameObjects.at(i)->collider);
             if ( Collide(bc) )
             {
-                center = currentCenter;
-                QVector3D vect =(MainWidget::gameObjects.at(i)->transform->position - gameObject->transform->position).normalized();
+                QVector3D vect = moveVect;
 
-                QVector3D v = 0.75 * moveVect * QVector3D::dotProduct(moveVect.normalized(),vect);
-                Move(v);
+                //QVector3D vect =(MainWidget::gameObjects.at(i)->transform->position - gameObject->transform->position).normalized();
+                int i = 0;
+                while (Collide(bc) && i < 10)
+                {
+                    //qDebug() << vect;
+                    vect = vect - (vect * 0.5);
+                    center = currentCenter + vect;
+                    i ++;
+                }
+                center = currentCenter;
+                //gameObject->transform->position += moveVect;
+                //QVector3D v = 0.25 * moveVect * QVector3D::dotProduct(moveVect.normalized(),vect);
+                Move(vect);
 
                 return;
             }

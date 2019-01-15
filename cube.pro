@@ -10,7 +10,6 @@ SOURCES += main.cpp \
     collider.cpp \
     timer_manager.cpp \
     inputmapping.cpp \
-    camera.cpp \
     transform.cpp \
     component.cpp \
     playercomponent.cpp \
@@ -35,7 +34,6 @@ HEADERS += \
     collider.h \
     timer_manager.h \
     inputmapping.h \
-    camera.h \
     transform.h \
     component.h \
     playercomponent.h \
@@ -59,7 +57,6 @@ target.path = $$[QT_INSTALL_EXAMPLES]/opengl/cube
 INSTALLS += target
 
 DISTFILES += \
-    cube.png \
     cube.obj \
     cube.obj \
     cube.obj \
