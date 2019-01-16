@@ -89,6 +89,9 @@ public:
     static QList<QString> listLevels;
     static int levelNumber;
     static std::vector<GameObject *> gameObjects;
+    static float coefTrackPlayer;
+    static QVector3D centerMap;
+    static float size;
 
     explicit MainWidget(double value, int seasonStart, QWidget *parent = 0);
     ~MainWidget();

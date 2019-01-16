@@ -67,6 +67,9 @@ QVector3D MainWidget::startPosition = QVector3D(0,0,0);
 int MainWidget::score = 0;
 int MainWidget::levelNumber = 0;
 QList<QString> MainWidget::listLevels;
+float MainWidget::coefTrackPlayer = 1.0f;
+QVector3D MainWidget::centerMap = QVector3D(0,0,0);
+float MainWidget::size = 45.0f;
 
 MainWidget::MainWidget(double frequence, int seasonStart,QWidget *parent) :
     QOpenGLWidget(parent),
@@ -280,14 +283,14 @@ void MainWidget::initializeGL()
 //! [2]
 //!
 //!
-    listLevels = {"../ProjectMDJ/Levels/levelTest2.txt",
-                  "../ProjectMDJ/Levels/level01.txt",
-                  "../ProjectMDJ/Levels/level02.txt",
-                  "../ProjectMDJ/Levels/level03.txt",
+    listLevels = {"../ProjectMDJ/Levels/level03.txt",
+                  "../ProjectMDJ/Levels/level10.txt",
                   "../ProjectMDJ/Levels/level04.txt",
+                  "../ProjectMDJ/Levels/level08.txt",
+                  "../ProjectMDJ/Levels/level02.txt",
+                  "../ProjectMDJ/Levels/level01.txt",
                   "../ProjectMDJ/Levels/level05.txt",
-                  "../ProjectMDJ/Levels/level07.txt",
-                  "../ProjectMDJ/Levels/level08.txt"};
+                  "../ProjectMDJ/Levels/level07.txt"};
 
     //gameObjects.push_back(playerObject);
 
@@ -378,17 +381,36 @@ void MainWidget::Joypad()
         );
     connect(gamepad, &QGamepad::buttonStartChanged, this, [](bool value)
         {
-            if (value) SwitchComponent::activate = !SwitchComponent::activate;
+            if (value) MainWidget::levelNumber = (MainWidget::levelNumber + 1) % MainWidget::listLevels.size();
         }
         );
     connect(gamepad, &QGamepad::buttonSelectChanged, this, [](bool value)
         {
-            if (value) MainWidget::score = 5;
+            if (value)
+            {
+                MainWidget::score = 5;
+            }
         }
         );
     connect(gamepad, &QGamepad::buttonAChanged, this, [](bool value)
         {
             if (value) GravityComponent::gravity *= -1;
+        }
+        );
+    connect(gamepad, &QGamepad::buttonL1Changed, this, [](bool value)
+        {
+            if (value) MainWidget::coefTrackPlayer = 0.0f;
+            else MainWidget::coefTrackPlayer = 1.0f;
+        }
+        );
+    connect(gamepad, &QGamepad::buttonL2Changed, this, [](bool value)
+        {
+            MainWidget::size -=0.5f;
+        }
+        );
+    connect(gamepad, &QGamepad::buttonR2Changed, this, [](bool value)
+        {
+            MainWidget::size +=0.5f;
         }
         );
 }
@@ -456,12 +478,12 @@ void MainWidget::Update()
 
 
     // CAMERA
-    posCamera = QVector3D(radiusCamera * cos(applicationTime)*cos(heightCamera),
-                          radiusCamera * sin(applicationTime)*cos(heightCamera),
-                          radiusCamera * sin(heightCamera));
+    posCamera = QVector3D(size * cos(applicationTime)*cos(heightCamera),
+                          size * sin(applicationTime)*cos(heightCamera),
+                          size * sin(heightCamera));
 
 
-    targetCamera += (playerObject->transform->position  - targetCamera) *0.05f;
+    targetCamera += ((MainWidget::centerMap *(1-coefTrackPlayer) + playerObject->transform->position * coefTrackPlayer)  - targetCamera) *0.05f;
 
     // Activation des composantas du joueur
     for (unsigned int i = 0; i < playerObject->components.size(); i++) playerObject->components[i]->Do();

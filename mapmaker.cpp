@@ -40,6 +40,7 @@ void  MapMaker::CreateLevel(QString mapfile)
     int x,y;
     int t = sscanf_s(lineHeader, "%d%d%d\n", &X,&Y,&Z);
     std::cout << X << ", " << Y << ", "<< Z << std::endl;
+    MainWidget::centerMap = QVector3D(0, 0, Z/2.0);
     InstantiateMesh();
     if (t != 3)
     {
@@ -99,6 +100,15 @@ void  MapMaker::CreateLevel(QString mapfile)
                     {
                         gameObject->collider = bc;
                         gameObject->meshId = MeshID::MUD_BLOCK;
+                        bc->gameObject = gameObject;
+                        gameObject->transform->getMatrix();
+                        (MainWidget::gameObjects).push_back(gameObject);
+                        //m->Compute(gameObject->transform);
+                    }
+                    else if (c == 'G')
+                    {
+                        gameObject->collider = bc;
+                        gameObject->meshId = MeshID::GRID_BLOCK;
                         bc->gameObject = gameObject;
                         gameObject->transform->getMatrix();
                         (MainWidget::gameObjects).push_back(gameObject);
@@ -363,6 +373,13 @@ void MapMaker::InstantiateMesh()
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
     m->Load("../ProjectMDJ/Model/plank.obj");
     m->LoadTexture("../ProjectMDJ/Texture/plank.png");
+    m->Compute(t);
+
+    // 12 - PLANK BLOCK
+    MeshRenderer::instance->meshes.push_back(new Mesh3D());
+    m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
+    m->Load("../ProjectMDJ/Model/grid.obj");
+    m->LoadTexture("../ProjectMDJ/Texture/block.png");
     m->Compute(t);
 
 }

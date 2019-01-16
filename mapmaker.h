@@ -6,16 +6,17 @@
 enum MeshID {GRASS_BLOCK,
              MOVABLE_BLOCK,
              WIRED_BLOCK_BLUE,
-            FULL_BLOCK_BLUE,
-            WIRED_BLOCK_RED,
-            FULL_BLOCK_RED,
-            SWITCH_UP_RED,
-            SWITCH_UP_BLUE,
-            STAR,
-            INVISIBLE_BLOCK,
-            MUD_BLOCK,
-            SWITCH_DOWN_BLACK,
-            PLANK_BLOCK};
+             FULL_BLOCK_BLUE,
+             WIRED_BLOCK_RED,
+             FULL_BLOCK_RED,
+             SWITCH_UP_RED,
+             SWITCH_UP_BLUE,
+             STAR,
+             INVISIBLE_BLOCK,
+             MUD_BLOCK,
+             SWITCH_DOWN_BLACK,
+             PLANK_BLOCK,
+             GRID_BLOCK};
 
 
 class MapMaker
