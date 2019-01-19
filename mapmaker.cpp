@@ -375,7 +375,7 @@ void MapMaker::InstantiateMesh()
     m->LoadTexture("../ProjectMDJ/Texture/plank.png");
     m->Compute(t);
 
-    // 12 - PLANK BLOCK
+    // 13 - GRID BLOCK
     MeshRenderer::instance->meshes.push_back(new Mesh3D());
     m = MeshRenderer::instance->meshes[MeshRenderer::instance->meshes.size()-1];
     m->Load("../ProjectMDJ/Model/grid.obj");

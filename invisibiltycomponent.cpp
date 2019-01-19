@@ -19,5 +19,5 @@ void InvisibiltyComponent::Do()
         gameObject->collider->isTrigger = false;
     }
     //if (gameObject->meshInstanceId>-1) MeshRenderer::instance->transitions[gameObject->meshId][gameObject->meshInstanceId] = gameObject->transform->transformMatrix;
-    MeshRenderer::instance->DrawSingle(gameObject);
+    //MeshRenderer::instance->DrawSingle(gameObject);
 }

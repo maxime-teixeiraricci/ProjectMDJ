@@ -261,7 +261,7 @@ void MainWidget::ChangeLevel(QString level)
 
     gameObjects.push_back(playerObject);
     gameObjects.push_back(skybox);
-    MeshRenderer::instance->Init(&program);
+    MeshRenderer::instance->Init();
 }
 
 void MainWidget::initializeGL()
@@ -281,8 +281,7 @@ void MainWidget::initializeGL()
     glEnable( GL_FRONT);
 
 //! [2]
-//!
-//!
+
     listLevels = {"../ProjectMDJ/Levels/level03.txt",
                   "../ProjectMDJ/Levels/level10.txt",
                   "../ProjectMDJ/Levels/level04.txt",
@@ -292,15 +291,7 @@ void MainWidget::initializeGL()
                   "../ProjectMDJ/Levels/level05.txt",
                   "../ProjectMDJ/Levels/level07.txt"};
 
-    //gameObjects.push_back(playerObject);
-
-    //MeshRenderer::instance->meshes.push_back(m5);
-
-
-
     ChangeLevel(MainWidget::listLevels[MainWidget::levelNumber]);
-
-
     m_time.start();
 }
 
@@ -450,7 +441,7 @@ void MainWidget::paintGL()
     program.setUniformValue("texture", 0);
 
     MeshRenderer::instance->ComputeGameObject();
-    MeshRenderer::instance->Draw(&program);
+    MeshRenderer::instance->Draw();
     update();
 
 }
@@ -474,7 +465,7 @@ void MainWidget::Update()
     heightCamera += -GravityComponent::GetDirection() * InputMapping::inputMap["CameraVerticalAxis"] * 0.035;
     if (heightCamera > 1.3) heightCamera = 1.3;
     if (heightCamera < -1.3) heightCamera = -1.3;
-    float radius = 45.0f;
+
 
 
     // CAMERA
@@ -485,8 +476,6 @@ void MainWidget::Update()
 
     targetCamera += ((MainWidget::centerMap *(1-coefTrackPlayer) + playerObject->transform->position * coefTrackPlayer)  - targetCamera) *0.05f;
 
-    // Activation des composantas du joueur
-    for (unsigned int i = 0; i < playerObject->components.size(); i++) playerObject->components[i]->Do();
 
     // Activation des composants des autres gameobjects
     for (unsigned int i = 0; i < gameObjects.size(); i++)
@@ -511,11 +500,10 @@ void MainWidget::Update()
     updateTime.restart();
     frameNumber ++;
 
-
-
-    if (frameNumber % 50 == 0)
+    if (frameNumber % 20 == 0)
     {
-        std::cout << "Update Time : " << deltaTimeFPS/50.0 << "ms [FPS " << 1.0/(deltaTimeFPS/50.0)<<"]"<< std::endl;
+        app->setApplicationName(QString("FPS : %1 - %2").arg( (int)(1.0/(deltaTimeFPS/20.0)) ).arg(MainWidget::listLevels[MainWidget::levelNumber]));
+        setWindowTitle( QCoreApplication::applicationName() );
         deltaTimeFPS = 0;
     }
 

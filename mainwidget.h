@@ -74,6 +74,7 @@
 #include "QDebug"
 #include "QtGamepad/QGamepad"
 #include "QtGamepad/QGamepadManager"
+#include "QApplication"
 
 class GeometryEngine;
 
@@ -108,6 +109,7 @@ public:
     int frameNumber = 0;
     float deltaTimeFPS;
     void Joypad();
+    QApplication *app;
     QGamepad *gamepad = nullptr;
 
 public slots:

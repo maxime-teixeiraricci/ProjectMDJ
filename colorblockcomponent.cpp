@@ -25,6 +25,6 @@ void ColorBlockComponent::Do()
     }
 
 
-    MeshRenderer::instance->DrawSingle(gameObject);
+    //MeshRenderer::instance->DrawSingle(gameObject);
 }
 

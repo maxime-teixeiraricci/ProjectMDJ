@@ -27,7 +27,7 @@ void PlayerComponent::Move()
 
     // Pour eviter des artefacts dans les déplacements liés à une chute de FrameRate
     double dt = std::min( (1/30.0) , MainWidget::deltaTime);
-    QVector3D move = v * dt * 5;
+    QVector3D move = v * dt * 8.5;
 
     gameObject->collider->Move(QVector3D(move.x(),0,0));
     gameObject->collider->Move(QVector3D(0,move.y(),0));

@@ -66,15 +66,17 @@ int main(int argc, char *argv[])
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
-    app.setApplicationName("cube");
+
+    app.setApplicationDisplayName("GraviCube");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
 
     MainWidget *widget1 = new MainWidget(120,0);
+    widget1->app = &app;
 
     QTimer *timer = new QTimer();
     QObject::connect(timer, SIGNAL(timeout()), widget1, SLOT(Update()));
-    timer->start(1000.0f * 1.0f/60.0f);
+    timer->start(1000.0f * 1.0f/90.0f);
 
     widget1->showMaximized();
 #else

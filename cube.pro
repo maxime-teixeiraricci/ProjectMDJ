@@ -7,7 +7,6 @@ TEMPLATE = app
 SOURCES += main.cpp \
     mesh.cpp \
     gameobject.cpp \
-    collider.cpp \
     timer_manager.cpp \
     inputmapping.cpp \
     transform.cpp \
@@ -31,7 +30,6 @@ HEADERS += \
     mainwidget.h \
     mesh.h \
     gameobject.h \
-    collider.h \
     timer_manager.h \
     inputmapping.h \
     transform.h \

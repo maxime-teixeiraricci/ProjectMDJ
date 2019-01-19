@@ -77,11 +77,22 @@ void BoxColliderComponent::Move(QVector3D moveVect)
 
 void BoxColliderComponent::Teleport(QVector3D pos)
 {
+
     QVector3D currentCenter = center;
-    //center = currentCenter;
     center = pos;
+    for (unsigned int i = 0; i < MainWidget::gameObjects.size(); i++)
+    {
+        if (MainWidget::gameObjects.at(i) != gameObject &&
+                MainWidget::gameObjects.at(i)->collider != nullptr &&
+                !MainWidget::gameObjects.at(i)->collider->isTrigger)
+        {
+            BoxColliderComponent *bc = static_cast<BoxColliderComponent*> (MainWidget::gameObjects.at(i)->collider);
+            if ( Collide(bc) )
+            {
+                return;
+            }
+        }
+    }
     gameObject->transform->position = pos;
-    qDebug() << "TELEPORT";
-    MeshRenderer::instance->DrawSingle(gameObject);
 
 }
